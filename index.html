@@ -82,7 +82,10 @@ section{scroll-margin-top:70px}
 .meta button{background:none;border:0;color:var(--accent);font-weight:700;padding:0}
 
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding-bottom:20px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;text-align:left;padding:0}
+.wa{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;background:#1f9d55;color:#fff;border-radius:9px;padding:8px 6px;font-weight:800;font-size:13px;text-decoration:none}
+.wa::before{content:"";width:14px;height:14px;border-radius:50%;border:2px solid #fff;border-bottom-left-radius:2px;box-sizing:border-box}
+.wa:active{opacity:.85}
+.card{cursor:pointer;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;text-align:left;padding:0}
 .card.out .pic img{opacity:.45;filter:grayscale(.6)}
 .pic{position:relative;aspect-ratio:1;max-width:100%;background:#fff;display:grid;place-items:center}
 .pic img{width:100%;height:100%;object-fit:contain;display:block}
@@ -261,7 +264,8 @@ function shell(){
     var v=b.dataset.b;ui.brand=(ui.brand===v?"all":v);ui.line="all";ui.cat="all";ui.stock=true;ui.nw=false;renderCats();renderBrands();renderSub();renderGrid();
     if(ui.brand!=="all")$("#catalog").scrollIntoView({block:"start"})});
   $("#reset").addEventListener("click",function(){ui={brand:"all",line:"all",cat:"all",q:"",stock:true,slide:ui.slide};$("#q").value="";renderBrands();renderCats();renderSub();renderGrid()});
-  $("#grid").addEventListener("click",function(e){var c=e.target.closest(".card");if(c)openProduct(c.dataset.id)});
+  $("#grid").addEventListener("click",function(e){if(e.target.closest(".wa"))return;var c=e.target.closest(".card");if(c)openProduct(c.dataset.id)});
+  $("#grid").addEventListener("keydown",function(e){if(e.key!=="Enter"&&e.key!==" ")return;var c=e.target.closest(".card");if(c&&e.target===c){e.preventDefault();openProduct(c.dataset.id)}});
   $("#track").addEventListener("click",function(e){var a=e.target.closest(".slide");if(!a)return;var l=a.dataset.link||"";
     if(l==="brand:__new"){e.preventDefault();showNew();return}
     if(l.indexOf("brand:")===0){e.preventDefault();ui.brand=l.slice(6);ui.line="all";ui.cat="all";ui.stock=true;ui.nw=false;renderCats();renderBrands();renderSub();renderGrid();$("#catalog").scrollIntoView({block:"start"})}});
@@ -292,7 +296,7 @@ function renderTexts(){
   var c=[];
   if(t.address)c.push('<div class="cline"><div><small>Адрес</small><b>'+esc(t.address)+'</b></div></div>');
   if(t.hours)c.push('<div class="cline"><div><small>Часы работы</small><b>'+esc(t.hours)+'</b></div></div>');
-  if(t.phone)c.push('<div class="cline"><div><small>Телефон / WhatsApp</small><b>'+esc(t.phone)+'</b></div>'+(digits(t.phone).length>6?'<a href="https://wa.me/'+digits(t.phone)+'" target="_blank" rel="noopener">WhatsApp</a>':'<button data-copy="'+esc(t.phone)+'">Копировать</button>')+'</div>');
+  if(t.phone)c.push('<div class="cline"><div><small>Телефон / WhatsApp</small><b>'+esc(t.phone)+'</b></div>'+(digits(t.phone).length>6?'<a href="https://api.whatsapp.com/send?phone='+digits(t.phone)+'&text='+encodeURIComponent("Здравствуйте! Пишу с сайта T Store.")+'" target="_blank" rel="noopener">WhatsApp</a>':'<button data-copy="'+esc(t.phone)+'">Копировать</button>')+'</div>');
   if(t.telegram)c.push('<div class="cline"><div><small>Telegram</small><b>@'+esc(tgNick(t.telegram))+'</b></div><a href="https://t.me/'+encodeURIComponent(tgNick(t.telegram))+'" target="_blank" rel="noopener">Написать</a></div>');
   if(t.instagram)c.push('<div class="cline"><div><small>Instagram</small><b>@'+esc(tgNick(t.instagram).replace(/^https?:\/\/(www\.)?instagram\.com\//,"").replace(/\/$/,""))+'</b></div><a href="https://instagram.com/'+encodeURIComponent(tgNick(t.instagram).replace(/^https?:\/\/(www\.)?instagram\.com\//,"").replace(/\/$/,""))+'" target="_blank" rel="noopener">Открыть</a></div>');
   if(!c.length)c.push('<div class="cline"><div><small>Контакты</small><b>Скоро здесь появятся телефон и мессенджеры</b></div></div>');
@@ -353,16 +357,18 @@ function renderGrid(){
   $("#found").textContent="Найдено: "+list.length;
   $("#reset").hidden=!(ui.nw||ui.brand!=="all"||ui.cat!=="all"||ui.q||!ui.stock);
   $("#grid").innerHTML=list.length?list.map(function(p){var L=lineOf(p.l);
-    return '<button class="card'+(p.s>0?"":" out")+'" data-id="'+esc(p.id)+'"><span class="pic">'+picHtml(p,true)+(p.s>0?"":'<span class="tag">Нет в наличии</span>')+(p.nw?'<span class="newtag">NEW</span>':'')+'</span>'+
+    var wh=waHref(p);return '<div class="card'+(p.s>0?"":" out")+'" role="button" tabindex="0" data-id="'+esc(p.id)+'"><span class="pic">'+picHtml(p,true)+(p.s>0?"":'<span class="tag">Нет в наличии</span>')+(p.nw?'<span class="newtag">NEW</span>':'')+'</span>'+
      '<span class="info"><span class="ln">'+esc(L.brand)+' · '+esc(L.short||L.name)+'</span><span class="nmT">'+esc(p.n)+'</span><span class="fl">'+esc(p.f||"")+'</span>'+
-     '<span class="row">'+stockHtml(p)+(p.p?'<span class="price">'+esc(p.p)+'</span>':'')+'</span></span></button>'}).join("")
+     '<span class="row">'+stockHtml(p)+(p.p?'<span class="price">'+esc(p.p)+'</span>':'')+'</span>'+(wh&&p.s>0?'<a class="wa" href="'+wh+'" target="_blank" rel="noopener">WhatsApp</a>':'')+'</span></div>'}).join("")
    :'<p class="empty">Ничего не найдено. Попробуйте другой вкус или сбросьте фильтры.</p>';
 }
+function waMsg(p){var L=lineOf(p.l);return "Здравствуйте! Хочу заказать: "+L.brand+" "+(L.short||"")+" — "+p.n+(p.f?" ("+p.f+")":"")+". Есть в наличии?"}
+function waHref(p){var d=digits(st.texts.phone);return d.length>6?"https://api.whatsapp.com/send?phone="+d+"&text="+encodeURIComponent(waMsg(p)):""}
 function openProduct(id){
   var p=st.products.find(function(x){return x.id===id});if(!p)return;var L=lineOf(p.l),t=st.texts;
-  var msg="Здравствуйте! Есть ли в наличии "+L.brand+" "+(L.short||"")+" "+p.n+"?";
+  var msg=waMsg(p);
   var acts="";
-  if(digits(t.phone).length>6)acts+='<a class="btn main" href="https://wa.me/'+digits(t.phone)+'?text='+encodeURIComponent(msg)+'" target="_blank" rel="noopener">Спросить в WhatsApp</a>';
+  if(digits(t.phone).length>6)acts+='<a class="btn main" href="'+waHref(p)+'" target="_blank" rel="noopener">Заказать в WhatsApp</a>';
   if(t.telegram)acts+='<a class="btn" href="https://t.me/'+encodeURIComponent(tgNick(t.telegram))+'" target="_blank" rel="noopener">Написать в Telegram</a>';
   if(!acts)acts='<a class="btn" href="#contacts" id="toC">Контакты магазина</a>';
   $("#sheet").innerHTML='<div class="grab"></div><button class="x" aria-label="Закрыть">×</button><div class="pic" style="position:relative">'+picHtml(p)+(p.nw?'<span class="newtag">NEW</span>':'')+'</div>'+
