@@ -1,4 +1,5 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>T Store</title>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>T Store</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;600;700;800&display=swap">
 <style id="css">
 /* Layout: mobile-first shop. Sticky brand-brown header, swipeable ad banner, brand strip, sticky filter rail, 2-col product grid (3-5 on wider screens), bottom-sheet product view, owner-only admin overlay */
@@ -611,6 +612,14 @@ function validate(){
   return bad;
 }
 function niceTel(s){var d=digits(s);if(d.indexOf("374")===0){d=d.replace(/^3740?/,"");if(d.length===8)return "+374 "+d.slice(0,2)+" "+d.slice(2,5)+" "+d.slice(5)}return String(s).trim()}
+function sendOrder(no,t){
+  var url=(st.shop.hook||"").trim();if(!/^https:\/\/script\.google\.com\//.test(url))return;
+  var body=JSON.stringify({no:no,name:form.name.trim(),phone:niceTel(form.phone),addr:form.addr.trim(),pay:form.pay,note:form.note.trim(),cur:cur(),
+    n:t.n,full:t.full,off:t.off,total:t.total,src:location.hostname.indexOf("github")>=0?"GitHub":"Claude",
+    items:t.lines.map(function(l){return {t:pTitle(l.p)+(l.p.f?" ("+l.p.f+")":""),q:l.q,p:l.pr.base?l.sum:0}})});
+  try{if(navigator.sendBeacon&&navigator.sendBeacon(url,new Blob([body],{type:"text/plain"})))return}catch(e){}
+  try{fetch(url,{method:"POST",mode:"no-cors",keepalive:true,headers:{"Content-Type":"text/plain"},body:body}).catch(function(){})}catch(e){}
+}
 function orderNo(){return String(Date.now()).slice(-6)}
 function pad(n){return (n<10?"0":"")+n}
 function buildMsg(no,t,now){
@@ -640,6 +649,7 @@ function onConfirm(e){
   if(digits(st.texts.phone).length<7){e.preventDefault();toast("Номер WhatsApp магазина не указан");return}
   var no=orderNo(),now=new Date();
   a.href=waUrl(buildMsg(no,t,now));
+  sendOrder(no,t);
   cart=[];saveCart();ss("tform",JSON.stringify({name:form.name,phone:form.phone,addr:form.addr,pay:form.pay,note:""}));form.note="";
   setTimeout(function(){
     paintCartBits();renderGrid();sheetMode={k:"done"};
@@ -783,8 +793,9 @@ function discTab(){
 
 /* orders tab */
 function ordersTab(){
-  return '<div class="box"><h4>Как приходят заказы</h4><p class="hint" style="margin:0">Покупатель собирает корзину, заполняет имя, телефон, адрес и способ оплаты — сайт сам считает суммы и скидки и открывает WhatsApp с готовым сообщением на номер '+esc(st.texts.phone||"(не указан)")+'. В сообщении есть номер заказа. Номер WhatsApp меняется во вкладке «Тексты и настройки».</p></div>'+
-   '<div class="box"><h4>История заказов</h4><p class="hint" style="margin:0">Сейчас все заказы приходят только в WhatsApp. Сохранять их на сайте пока нельзя: покупатели заходят без аккаунта, и сайт не может записывать данные от их имени. Журнал заказов со статусами можно подключить через Google Таблицу — попросите Claude.</p></div>';
+  var on=/^https:\/\/script\.google\.com\//.test(st.shop.hook||"");
+  return '<div class="box"><h4>Как приходят заказы</h4><p class="hint" style="margin:0">Покупатель собирает корзину, заполняет имя, телефон, адрес и способ оплаты — сайт сам считает суммы и скидки и открывает WhatsApp с готовым сообщением на номер '+esc(st.texts.phone||"(не указан)")+'.</p></div>'+
+   '<div class="box"><h4>Журнал заказов в Google Таблице</h4>'+(on?'<p class="hint">Подключён: каждый заказ также записывается строкой в вашу Google Таблицу, лист «Заказы». Статус (Новый → Подтверждён → В обработке → Передан курьеру → Доставлен / Отменён) меняйте там в столбце «Статус». Таблицу видите только вы.</p>'+(st.shop.sheet?'<a class="btn main" href="'+esc(st.shop.sheet)+'" target="_blank" rel="noopener">Открыть таблицу заказов</a>':''):'<p class="hint" style="margin:0">Не подключён. Ссылку на Google Apps Script можно вставить во вкладке «Тексты и настройки».</p>')+'</div>';
 }
 
 function bannersTab(){
@@ -807,7 +818,8 @@ function bannersTab(){
 var TEXTF=[["brand","Название магазина"],["heroTitle","Главный заголовок"],["heroText","Текст под заголовком","ta"],["address","Адрес"],["delivery","Доставка / самовывоз"],["hours","Часы работы"],["phone","Номер WhatsApp для заказов"],["telegram","Telegram (ник)"],["instagram","Instagram (ник)"],["aboutTitle","Заголовок блока «О магазине»"],["warn","Предупреждение вверху"],["footerNote","Текст внизу сайта"]];
 function textsTab(){
   var t=st.texts;
-  return '<div class="box"><h4>Заказы</h4><label class="f"><span>Валюта</span><input data-shop="cur" value="'+esc(cur())+'" maxlength="8"></label>'+
+  return '<div class="box"><h4>Заказы</h4><label class="f"><span>Ссылка Google Apps Script (журнал заказов)</span><input data-shop="hook" value="'+esc(st.shop.hook||"")+'" placeholder="https://script.google.com/macros/s/…/exec"></label>'+
+   (st.shop.sheet?'<p class="hint"><a href="'+esc(st.shop.sheet)+'" target="_blank" rel="noopener">Открыть таблицу заказов</a></p>':'')+'<label class="f"><span>Валюта</span><input data-shop="cur" value="'+esc(cur())+'" maxlength="8"></label>'+
    '<label class="f"><span>Способы оплаты при получении (каждый с новой строки)</span><textarea data-shop="pay">'+esc(st.shop.pay.join("\n"))+'</textarea></label></div>'+
   '<div class="box"><h4>Основное и контакты</h4>'+TEXTF.map(function(f){return '<label class="f"><span>'+f[1]+'</span>'+(f[2]?'<textarea data-tf="'+f[0]+'">'+esc(t[f[0]])+'</textarea>':'<input data-tf="'+f[0]+'" value="'+esc(t[f[0]])+'"'+(f[0]==="phone"?' inputmode="tel" placeholder="+374 …"':'')+'>')+'</label>'}).join("")+'</div>'+
   '<div class="box"><h4>Преимущества магазина</h4>'+(t.feats||[]).map(function(f,i){return '<div class="two"><label class="f"><span>Заголовок '+(i+1)+'</span><input data-ff="'+i+'" data-k="t" value="'+esc(f.t)+'"></label><label class="f"><span>Текст '+(i+1)+'</span><input data-ff="'+i+'" data-k="d" value="'+esc(f.d)+'"></label></div>'}).join("")+'</div>';
@@ -829,6 +841,7 @@ function onAdminInput(e){
   if(d.bf&&d.bf!=="linkSel"&&d.bf!=="fg"){var b=st.banners.find(function(x){return x.id===attr(el,"id")});if(b){b[d.bf]=el.value;if(d.bf==="bg"){var pv=el.closest(".box").querySelector(".pv");if(pv)pv.style.background=el.value}markDirty();renderBanners()}return}
   if(d.tf){st.texts[d.tf]=el.value;markDirty();return}
   if(d.ff){st.texts.feats[+d.ff][d.k]=el.value;markDirty();return}
+  if(d.shop==="hook"){st.shop.hook=el.value.trim();markDirty();return}
   if(d.shop==="cur"){st.shop.cur=el.value.trim()||"AMD";markDirty();return}
   if(d.shop==="pay"){var arr=el.value.split("\n").map(function(x){return x.trim()}).filter(Boolean);if(arr.length){st.shop.pay=arr;markDirty()}return}
 }
