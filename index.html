@@ -1,4 +1,5 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>T Store</title>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>T Store</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;600;700;800&display=swap">
 <style id="css">
 /* Layout: mobile-first shop. Sticky brand-brown header, swipeable ad banner, brand strip, sticky filter rail, 2-col product grid (3-5 on wider screens), bottom-sheet product view, owner-only admin overlay */
@@ -304,7 +305,9 @@ body.hasbar main{padding-bottom:70px}
 .mcontact{margin-top:16px}
 .mcontact p{margin:0 0 10px}
 .mcontact small{display:block;color:var(--muted);font-size:12px}
-@media (max-width:420px){.ctx{display:none}.hnew{padding:8px 12px}.logo{font-size:16px}.bar{gap:10px}}
+.logo{white-space:nowrap;flex:none}
+@media (max-width:560px){.ctx{display:none}.cbtn{padding:8px 12px}.hnew{padding:8px 12px}.logo{font-size:16px}.bar{gap:10px}}
+@media (max-width:350px){.logo span:last-child{display:none}}
 @media (min-width:900px){.burger{display:none}}
 @media (min-width:700px){
   .sheet{top:50%;bottom:auto;left:50%;right:auto;transform:translate(-50%,-50%);width:min(560px,calc(100% - 48px));max-height:min(86vh,860px);border-radius:22px;padding:22px 24px 24px;box-shadow:0 24px 70px rgba(0,0,0,.35)}
