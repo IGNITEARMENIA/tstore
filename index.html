@@ -278,6 +278,21 @@ body.hasbar main{padding-bottom:70px}
 @media (min-width:640px){.sub{flex-basis:130px}}
 @media (min-width:900px){.subs{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));overflow:visible;margin-inline:0;padding-inline:0}.cats{margin-inline:0;padding-inline:0;flex-wrap:wrap}}
 .sheet .x{z-index:3}
+.burger{display:flex;flex-direction:column;justify-content:center;gap:4px;width:40px;height:40px;margin-left:-8px;margin-right:-6px;background:none;border:0;padding:9px;flex:none}
+.burger span{display:block;height:2px;border-radius:2px;background:var(--brand-ink)}
+.cbtn svg{flex:none}
+.ctx{font-style:normal}
+.mnav{display:grid;gap:8px;margin-top:6px}
+.mnav button{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-family:var(--display);font-weight:700;font-size:15px;text-align:left}
+.mnav button small{font-family:var(--body);font-weight:700;font-size:12.5px;color:var(--muted)}
+.mnav .mnew small{color:#e0412b}
+.mlinks{margin-top:16px}
+.mlinks button{font-family:var(--body);font-weight:800}
+.mcontact{margin-top:16px}
+.mcontact p{margin:0 0 10px}
+.mcontact small{display:block;color:var(--muted);font-size:12px}
+@media (max-width:420px){.ctx{display:none}.hnew{padding:8px 12px}.logo{font-size:16px}.bar{gap:10px}}
+@media (min-width:900px){.burger{display:none}}
 @media (min-width:700px){
   .sheet{top:50%;bottom:auto;left:50%;right:auto;transform:translate(-50%,-50%);width:min(560px,calc(100% - 48px));max-height:min(86vh,860px);border-radius:22px;padding:22px 24px 24px;box-shadow:0 24px 70px rgba(0,0,0,.35)}
   .sheet .grab{display:none}
@@ -382,9 +397,9 @@ function paintCartBits(){
 function shell(){
   $("#app").innerHTML=
   '<div class="warn" id="warn"></div>'+
-  '<header class="top"><div class="wrap bar"><a class="logo" href="#top"><span class="mark" aria-hidden="true"></span><span id="brandName"></span></a>'+
+  '<header class="top"><div class="wrap bar"><button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button><a class="logo" href="#top"><span class="mark" aria-hidden="true"></span><span id="brandName"></span></a>'+
   '<nav class="menu" aria-label="Разделы"><a href="#catalog">Каталог</a><a href="#about">О магазине</a><a href="#contacts">Контакты</a></nav>'+
-  '<a class="hnew" href="#new" id="goNew">NEW</a><button class="cbtn" id="cartBtn" aria-label="Корзина">Корзина <b id="cartN" hidden>0</b></button></div></header>'+
+  '<a class="hnew" href="#new" id="goNew">NEW</a><button class="cbtn" id="cartBtn" aria-label="Корзина"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg><i class="ctx">Корзина</i> <b id="cartN" hidden>0</b></button></div></header>'+
   '<main class="wrap" id="top">'+
    '<section class="banners" aria-label="Акции и новинки"><div class="track noscroll" id="track"></div><div class="dots" id="dots"></div></section>'+
    '<section class="hero"><h1 id="heroTitle"></h1><p id="heroText"></p><div class="pills" id="pills"></div></section>'+
@@ -425,6 +440,7 @@ function shell(){
   $("#sheet").addEventListener("click",onSheetClick);
   document.addEventListener("keydown",function(e){if(e.key==="Escape")closeSheet()});
   $("#cartBtn").addEventListener("click",openCart);
+  $("#burger").addEventListener("click",openMenu);
   $("#cartbar").addEventListener("click",openCart);
   $("#contactList").addEventListener("click",function(e){var b=e.target.closest("[data-copy]");if(!b)return;
     try{navigator.clipboard.writeText(b.dataset.copy).then(function(){b.textContent="Скопировано"},function(){})}catch(err){}});
@@ -569,12 +585,24 @@ function onSheetClick(e){
   if(!k)return;var a=k.dataset.k;
   if(a==="close"){closeSheet();return}
   if(a==="cart"){openCart();return}
+  if(a==="mcat"){closeSheet();pickCat(k.dataset.c);$("#catalog").scrollIntoView({block:"start"});return}
+  if(a==="mnew"){closeSheet();showNew();return}
+  if(a==="mgo"){closeSheet();var el=$(k.dataset.h);if(el)el.scrollIntoView({block:"start"});return}
   if(a==="shop"){closeSheet();$("#catalog").scrollIntoView({block:"start"});return}
   var row=k.closest("[data-cid]"),id=row&&row.dataset.cid;
   if(a==="cinc"||a==="cdec"){setCart(id,inCart(id)+(a==="cinc"?1:-1));renderCart();return}
   if(a==="crm"){setCart(id,0);renderCart();return}
   if(a==="checkout"){renderCheckout();return}
   if(a==="back"){renderCart();return}
+}
+function openMenu(){
+  sheetMode={k:"menu"};var t=st.texts||{},d=digits(t.phone);
+  openSheet('<h2>Меню</h2><div class="mnav">'+visCats().map(function(c){var n=st.products.filter(function(p){return pShown(p)&&pCat(p)===c.id&&inStock(p)}).length;
+    return '<button data-k="mcat" data-c="'+esc(c.id)+'"><span>'+esc(c.n)+'</span><small>'+(n?n+" в наличии":"скоро")+'</small></button>'}).join("")+
+   '<button data-k="mnew" class="mnew"><span>Новинки</span><small>NEW</small></button></div>'+
+   '<div class="mnav mlinks"><button data-k="mgo" data-h="#about"><span>О магазине</span></button><button data-k="mgo" data-h="#contacts"><span>Контакты</span></button></div>'+
+   '<div class="mcontact">'+(t.address?'<p><small>Адрес</small><b>'+esc(t.address)+'</b></p>':'')+(t.hours?'<p><small>Часы работы</small><b>'+esc(t.hours)+'</b></p>':'')+
+   (d.length>6?'<div class="acts"><a class="btn main" href="'+waUrl("Здравствуйте! Пишу с сайта "+(t.brand||"T Store")+".")+'" target="_blank" rel="noopener">Написать в WhatsApp</a><a class="btn" href="tel:+'+d+'">Позвонить '+esc(t.phone)+'</a></div>':'')+'</div>',"Меню");
 }
 function openCart(){sheetMode={k:"cart"};openSheet("","Корзина");renderCart()}
 function renderCart(){
