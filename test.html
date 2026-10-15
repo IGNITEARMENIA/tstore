@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Проверка журнала заказов</title>
+<style>
+:root{--bg:#efeae1;--fg:#33211c;--brand:#754d43;--line:#dcd2c3}
+@media (prefers-color-scheme:dark){:root{--bg:#1f1512;--fg:#efe8dc;--brand:#a87a6c;--line:#47322b}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,sans-serif;padding:24px 16px}
+main{max-width:520px;margin:0 auto}
+button{background:var(--brand);color:#fff;border:0;border-radius:12px;padding:14px 20px;font:inherit;font-weight:700;width:100%}
+pre{white-space:pre-wrap;word-break:break-word;background:rgba(0,0,0,.06);border:1px solid var(--line);border-radius:10px;padding:12px;min-height:60px}
+</style></head><body><main>
+<h1 style="font-size:22px">Проверка журнала заказов</h1>
+<p>Нажмите кнопку. В таблицу добавится тестовая строка «ПРОВЕРКА», а ниже появится ответ Google. Сделайте снимок экрана с ответом и пришлите его в чат.</p>
+<button id="b">Отправить тестовый заказ</button>
+<pre id="o">—</pre>
+</main>
+<script>
+var URL_="https://script.google.com/macros/s/AKfycby57NKOtd2W3ApCGhrTQNvEKE4kaSQpMLkdQwQclwMwB4CH4KBKWrDOuxZGWn-DNinC/exec";
+document.getElementById("b").onclick=function(){
+  var o=document.getElementById("o");o.textContent="Отправляю…";
+  var body=JSON.stringify({no:"TEST"+Date.now().toString().slice(-4),name:"ПРОВЕРКА",phone:"+374 00 000 000",addr:"тестовая строка, можно удалить",pay:"Наличные",note:"",cur:"AMD",n:1,full:1800,off:0,total:1800,src:"проверка",items:[{t:"KLINT — ONE",q:1,p:1800}]});
+  fetch(URL_,{method:"POST",credentials:"omit",headers:{"Content-Type":"text/plain;charset=utf-8"},body:body})
+   .then(function(r){return r.text().then(function(t){o.textContent="Статус: "+r.status+"\n\n"+t.replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim().slice(0,600)})})
+   .catch(function(e){o.textContent="Ответ прочитать нельзя: "+e+"\n\nПроверьте таблицу — если строка «ПРОВЕРКА» появилась, всё работает."});
+};
+</script></body></html>
