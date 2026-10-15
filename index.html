@@ -253,12 +253,19 @@ body.hasbar main{padding-bottom:70px}
 .note{color:var(--muted);font-size:12.5px;margin:6px 0 0}
 .ofrm .f input,.ofrm .f textarea{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-size:16px;width:100%}
 .ofrm .f textarea{min-height:70px;resize:vertical}
+.telrow{display:flex;gap:8px}
+.ccw{position:relative;flex:none;display:flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:0 12px;font-size:16px;font-weight:700;white-space:nowrap}
+.ccw::after{content:"▾";font-size:12px;color:var(--muted)}
+.ccw select{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px}
+.ccw:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.telrow input{flex:1;min-width:0}
+.ofrm .f.bad .telrow input,.ofrm .f.bad .ccw{border-color:var(--danger)}
 .ofrm .f.bad input,.ofrm .f.bad textarea,.ofrm .f.bad .payl{border-color:var(--danger)}
 .ofrm .f em{color:var(--danger);font-style:normal;font-size:12.5px;display:none}
 .ofrm .f.bad em{display:block}
 .payl{display:grid;gap:6px;border:1px solid transparent;border-radius:12px}
 .payl label{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-weight:700}
-.payl input{width:18px;height:18px;accent-color:var(--accent)}
+.ofrm .payl input{width:20px;height:20px;flex:none;padding:0;margin:0;border:0;accent-color:var(--accent)}
 .done{text-align:center;padding:16px 0}
 .done .ok{width:56px;height:56px;border-radius:50%;background:var(--ok);color:#fff;display:grid;place-items:center;font-size:28px;margin:0 auto 10px}
 .toast{position:fixed;left:50%;top:calc(68px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:45;background:var(--fg);color:var(--bg);border-radius:999px;padding:9px 16px;font-weight:700;font-size:13.5px;box-shadow:0 6px 20px rgba(0,0,0,.25);max-width:calc(100% - 32px)}
@@ -581,16 +588,22 @@ function renderCart(){
   }
   var s=$("#sheet");s.innerHTML='<div class="grab"></div><button class="x" data-k="close" aria-label="Закрыть">×</button>'+body;
 }
-var form={name:"",phone:"",addr:"",pay:"",note:""};
+var form={name:"",cc:"AM",phone:"",addr:"",pay:"",note:""};
+var CC="AM 374 Армения|RU 7 Россия|GE 995 Грузия|IR 98 Иран|US 1 США|FR 33 Франция|DE 49 Германия|UA 380 Украина|BY 375 Беларусь|KZ 7 Казахстан|AE 971 ОАЭ|TR 90 Турция|GB 44 Великобритания|AU 61 Австралия|AT 43 Австрия|AZ 994 Азербайджан|AL 355 Албания|DZ 213 Алжир|AD 376 Андорра|AO 244 Ангола|AR 54 Аргентина|AF 93 Афганистан|BD 880 Бангладеш|BH 973 Бахрейн|BE 32 Бельгия|BG 359 Болгария|BO 591 Боливия|BA 387 Босния и Герцеговина|BR 55 Бразилия|HU 36 Венгрия|VE 58 Венесуэла|VN 84 Вьетнам|GH 233 Гана|HK 852 Гонконг|GR 30 Греция|DK 45 Дания|EG 20 Египет|IL 972 Израиль|IN 91 Индия|ID 62 Индонезия|JO 962 Иордания|IQ 964 Ирак|IE 353 Ирландия|IS 354 Исландия|ES 34 Испания|IT 39 Италия|YE 967 Йемен|KH 855 Камбоджа|CM 237 Камерун|CA 1 Канада|QA 974 Катар|KE 254 Кения|CY 357 Кипр|KG 996 Киргизия|CN 86 Китай|CO 57 Колумбия|CR 506 Коста-Рика|CI 225 Кот-д’Ивуар|CU 53 Куба|KW 965 Кувейт|LV 371 Латвия|LB 961 Ливан|LY 218 Ливия|LT 370 Литва|LI 423 Лихтенштейн|LU 352 Люксембург|MY 60 Малайзия|MT 356 Мальта|MA 212 Марокко|MX 52 Мексика|MD 373 Молдова|MC 377 Монако|MN 976 Монголия|NP 977 Непал|NG 234 Нигерия|NL 31 Нидерланды|NZ 64 Новая Зеландия|NO 47 Норвегия|OM 968 Оман|PK 92 Пакистан|PA 507 Панама|PY 595 Парагвай|PE 51 Перу|PL 48 Польша|PT 351 Португалия|RO 40 Румыния|SA 966 Саудовская Аравия|MK 389 Северная Македония|SN 221 Сенегал|RS 381 Сербия|SG 65 Сингапур|SY 963 Сирия|SK 421 Словакия|SI 386 Словения|SD 249 Судан|TW 886 Тайвань|TJ 992 Таджикистан|TH 66 Таиланд|TZ 255 Танзания|TN 216 Тунис|TM 993 Туркменистан|UG 256 Уганда|UZ 998 Узбекистан|UY 598 Уругвай|PH 63 Филиппины|FI 358 Финляндия|HR 385 Хорватия|ME 382 Черногория|CZ 420 Чехия|CL 56 Чили|CH 41 Швейцария|SE 46 Швеция|LK 94 Шри-Ланка|EC 593 Эквадор|EE 372 Эстония|ET 251 Эфиопия|ZA 27 ЮАР|KR 82 Южная Корея|JP 81 Япония".split("|").map(function(s){var m=s.split(" ");return {iso:m[0],code:m[1],n:m.slice(2).join(" ")}});
+function ccOf(iso){return CC.find(function(c){return c.iso===iso})||CC[0]}
+function flag(iso){try{return String.fromCodePoint.apply(null,iso.split("").map(function(ch){return 127397+ch.charCodeAt(0)}))}catch(e){return ""}}
+function localDigits(){var d=digits(form.phone);if(form.cc==="AM")d=d.replace(/^0/,"");return d}
 function renderCheckout(){
   sheetMode={k:"co"};var t=totals();if(!t.lines.length){renderCart();return}
   try{var f=JSON.parse(ss("tform")||"null");if(f)form=Object.assign(form,f)}catch(e){}
-  if(!digits(form.phone))form.phone="+374 ";
+  if(!ccOf(form.cc)||ccOf(form.cc).iso!==form.cc)form.cc="AM";
+  if(/^\s*\+?374/.test(form.phone)){form.cc="AM";form.phone=form.phone.replace(/^\s*\+?374\s*/,"")}
+  if(/^\s*\+/.test(form.phone))form.phone="";
   var s=$("#sheet");
   s.innerHTML='<div class="grab"></div><button class="x" data-k="close" aria-label="Закрыть">×</button><button class="rm" data-k="back">← Назад в корзину</button><h2>Оформление заказа</h2>'+
   '<form class="ofrm" id="ofrm" novalidate>'+
    '<label class="f" data-f="name"><span>Имя</span><input name="name" autocomplete="name" maxlength="60" value="'+esc(form.name)+'"><em>Укажите имя</em></label>'+
-   '<label class="f" data-f="phone"><span>Телефон</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="+374 XX XXX XXX" value="'+esc(form.phone)+'"><em>Укажите номер полностью: +374 и 8 цифр</em></label>'+
+   '<div class="f" data-f="phone"><span>Телефон</span><div class="telrow"><label class="ccw"><span id="ccv">'+flag(form.cc)+' +'+ccOf(form.cc).code+'</span><select name="cc" aria-label="Код страны">'+CC.map(function(c){return '<option value="'+c.iso+'"'+(c.iso===form.cc?" selected":"")+'>'+flag(c.iso)+' '+esc(c.n)+' +'+c.code+'</option>'}).join("")+'</select></label><input name="phone" type="tel" inputmode="tel" autocomplete="tel-national" maxlength="20" placeholder="'+(form.cc==="AM"?"XX XXX XXX":"номер телефона")+'" value="'+esc(form.phone)+'"></div><em id="telErr">'+(form.cc==="AM"?"Укажите 8 цифр номера после +374":"Укажите номер телефона")+'</em></div>'+
    '<label class="f" data-f="addr"><span>Адрес доставки</span><textarea name="addr" maxlength="240" placeholder="Город, улица, дом, подъезд, квартира">'+esc(form.addr)+'</textarea><em>Укажите адрес доставки</em></label>'+
    '<div class="f" data-f="pay"><span>Оплата при получении</span><div class="payl" role="radiogroup">'+st.shop.pay.map(function(m){return '<label><input type="radio" name="pay" value="'+esc(m)+'"'+(form.pay===m?" checked":"")+'>'+esc(m)+'</label>'}).join("")+'</div><em>Выберите способ оплаты</em></div>'+
    '<label class="f"><span>Комментарий (необязательно)</span><textarea name="note" maxlength="300" placeholder="Например: позвонить перед доставкой">'+esc(form.note)+'</textarea></label>'+
@@ -600,21 +613,23 @@ function renderCheckout(){
   '<div class="acts"><a class="btn main" id="confirm" href="#" target="_blank" rel="noopener">Подтвердить заказ в WhatsApp</a></div>';
   $("#ofrm").addEventListener("input",function(e){var el=e.target;if(!el.name)return;form[el.name]=el.value;ss("tform",JSON.stringify(form));var w=el.closest(".f");if(w)w.classList.remove("bad")});
   $("#ofrm").addEventListener("submit",function(e){e.preventDefault()});
+  $("#ofrm").addEventListener("change",function(e){if(e.target.name!=="cc")return;form.cc=e.target.value;ss("tform",JSON.stringify(form));var c=ccOf(form.cc);$("#ccv").textContent=flag(c.iso)+" +"+c.code;
+    var ip=$("#ofrm [name=phone]");ip.placeholder=form.cc==="AM"?"XX XXX XXX":"номер телефона";$("#telErr").textContent=form.cc==="AM"?"Укажите 8 цифр номера после +374":"Укажите номер телефона";ip.focus()});
   $("#confirm").addEventListener("click",onConfirm);
 }
 function validate(){
   var bad=[];
   if(form.name.trim().length<2)bad.push("name");
-  var d=digits(form.phone);if(d.indexOf("374")===0?d.replace(/^3740?/,"").length!==8:(d.length<8||d.length>15))bad.push("phone");
+  var d=localDigits();if(form.cc==="AM"?d.length!==8:(d.length<5||d.length>14))bad.push("phone");
   if(form.addr.trim().length<5)bad.push("addr");
   if(st.shop.pay.indexOf(form.pay)<0)bad.push("pay");
   [].forEach.call(document.querySelectorAll("#ofrm .f[data-f]"),function(f){f.classList.toggle("bad",bad.indexOf(f.dataset.f)>=0)});
   return bad;
 }
-function niceTel(s){var d=digits(s);if(d.indexOf("374")===0){d=d.replace(/^3740?/,"");if(d.length===8)return "+374 "+d.slice(0,2)+" "+d.slice(2,5)+" "+d.slice(5)}return String(s).trim()}
+function niceTel(){var d=localDigits(),c=ccOf(form.cc);if(c.iso==="AM"&&d.length===8)return "+374 "+d.slice(0,2)+" "+d.slice(2,5)+" "+d.slice(5);return "+"+c.code+" "+d}
 function sendOrder(no,t){
   var url=(st.shop.hook||"").trim();if(!/^https:\/\/script\.google\.com\//.test(url))return;
-  var body=JSON.stringify({no:no,name:form.name.trim(),phone:niceTel(form.phone),addr:form.addr.trim(),pay:form.pay,note:form.note.trim(),cur:cur(),
+  var body=JSON.stringify({no:no,name:form.name.trim(),phone:niceTel(),addr:form.addr.trim(),pay:form.pay,note:form.note.trim(),cur:cur(),
     n:t.n,full:t.full,off:t.off,total:t.total,src:location.hostname.indexOf("github")>=0?"GitHub":"Claude",
     items:t.lines.map(function(l){return {t:pTitle(l.p)+(l.p.f?" ("+l.p.f+")":""),q:l.q,p:l.pr.base?l.sum:0}})});
   var sent=false;
@@ -626,7 +641,7 @@ function pad(n){return (n<10?"0":"")+n}
 function buildMsg(no,t,now){
   var C=" "+cur();
   var L=["*НОВЫЙ ЗАКАЗ*","Номер заказа: #"+no,"Дата: "+pad(now.getDate())+"."+pad(now.getMonth()+1)+"."+now.getFullYear()+" "+pad(now.getHours())+":"+pad(now.getMinutes()),"",
-    "*Информация о клиенте:*","• Имя: "+form.name.trim(),"• Телефон: "+niceTel(form.phone),"• Адрес доставки: "+form.addr.trim().replace(/\s*\n\s*/g,", "),"• Способ оплаты: "+form.pay,"","*Список товаров:*"];
+    "*Информация о клиенте:*","• Имя: "+form.name.trim(),"• Телефон: "+niceTel(),"• Адрес доставки: "+form.addr.trim().replace(/\s*\n\s*/g,", "),"• Способ оплаты: "+form.pay,"","*Список товаров:*"];
   t.lines.forEach(function(l,i){
     L.push((i+1)+". "+pTitle(l.p)+(l.p.f?" ("+l.p.f+")":""));
     L.push("   Количество: "+l.q+" шт.");
@@ -651,7 +666,7 @@ function onConfirm(e){
   var no=orderNo(),now=new Date();
   a.href=waUrl(buildMsg(no,t,now));
   sendOrder(no,t);
-  cart=[];saveCart();ss("tform",JSON.stringify({name:form.name,phone:form.phone,addr:form.addr,pay:form.pay,note:""}));form.note="";
+  cart=[];saveCart();ss("tform",JSON.stringify({name:form.name,cc:form.cc,phone:form.phone,addr:form.addr,pay:form.pay,note:""}));form.note="";
   setTimeout(function(){
     paintCartBits();renderGrid();sheetMode={k:"done"};
     $("#sheet").innerHTML='<div class="grab"></div><button class="x" data-k="close" aria-label="Закрыть">×</button><div class="done"><div class="ok">✓</div><h2>Заказ #'+no+' сформирован</h2>'+
