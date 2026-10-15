@@ -278,6 +278,8 @@ body.hasbar main{padding-bottom:70px}
 @media (min-width:640px){.sub{flex-basis:130px}}
 @media (min-width:900px){.subs{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));overflow:visible;margin-inline:0;padding-inline:0}.cats{margin-inline:0;padding-inline:0;flex-wrap:wrap}}
 .sheet .x{z-index:3}
+.sheet{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.scrim{touch-action:none;overscroll-behavior:contain}
 #aSave{transition:background .25s,color .25s,border-color .25s}
 #aSave.need{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 #aSave:disabled{background:transparent;color:#2f8a3a;border-color:#2f8a3a;opacity:1}
@@ -761,8 +763,12 @@ function onBuyClick(e){
   else if(b.dataset.b==="add"){setCart(id,inCart(id)+Math.min(q,maxQty(p)));ui.qty[id]=1;toast("Добавлено: "+p.n)}
   repaintBuy(id);
 }
-function openSheet(html,label){var s=$("#sheet");s.setAttribute("aria-label",label||"");s.innerHTML='<div class="grab"></div><button class="x" data-k="close" aria-label="Закрыть">×</button>'+html;s.hidden=false;$("#scrim").hidden=false;s.scrollTop=0}
-function closeSheet(){$("#sheet").hidden=true;$("#scrim").hidden=true;sheetMode=null}
+function openSheet(html,label){var s=$("#sheet");s.setAttribute("aria-label",label||"");s.innerHTML='<div class="grab"></div><button class="x" data-k="close" aria-label="Закрыть">×</button>'+html;s.hidden=false;$("#scrim").hidden=false;s.scrollTop=0;lockScroll()}
+var lockY=null;
+function lockScroll(){if(lockY!==null)return;lockY=window.scrollY||0;var b=document.body.style;b.position="fixed";b.top=(-lockY)+"px";b.left="0";b.right="0";b.width="100%"}
+function unlockScroll(){if(lockY===null)return;var y=lockY;lockY=null;var b=document.body.style;b.position="";b.top="";b.left="";b.right="";b.width="";
+  var r=document.documentElement,sb=r.style.scrollBehavior;r.style.scrollBehavior="auto";window.scrollTo(0,y);r.style.scrollBehavior=sb}
+function closeSheet(){$("#sheet").hidden=true;$("#scrim").hidden=true;sheetMode=null;unlockScroll()}
 var sheetMode=null;
 function openProduct(id){
   var p=st.products.find(function(x){return x.id===id});if(!p)return;var L=lineOf(p.l),x=priceOf(p);sheetMode={k:"p",id:id};
