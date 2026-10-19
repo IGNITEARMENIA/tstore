@@ -9,6 +9,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebChromeClient;
+import android.webkit.GeolocationPermissions;
+import android.content.pm.PackageManager;
+import android.Manifest;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -25,6 +28,8 @@ public class MainActivity extends Activity {
     private static final String HOST = "ignitearmenia.github.io";
     private WebView web;
     private View offline;
+    private String geoOrigin;
+    private GeolocationPermissions.Callback geoCb;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -51,7 +56,19 @@ public class MainActivity extends Activity {
         s.setCacheMode(WebSettings.LOAD_DEFAULT);
         s.setUserAgentString(s.getUserAgentString() + " TStoreApp/1");
 
-        web.setWebChromeClient(new WebChromeClient());
+        s.setGeolocationEnabled(true);
+        web.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback cb) {
+                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                        || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    cb.invoke(origin, true, false);
+                } else {
+                    geoOrigin = origin; geoCb = cb;
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 7);
+                }
+            }
+        });
         web.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest req) {
@@ -107,6 +124,17 @@ public class MainActivity extends Activity {
         b.setOnClickListener(v -> { offline.setVisibility(View.GONE); web.reload(); });
         box.addView(b);
         return box;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int code, String[] perms, int[] res) {
+        super.onRequestPermissionsResult(code, perms, res);
+        if (code == 7 && geoCb != null) {
+            boolean ok = false;
+            for (int r : res) if (r == PackageManager.PERMISSION_GRANTED) ok = true;
+            geoCb.invoke(geoOrigin, ok, false);
+            geoCb = null;
+        }
     }
 
     @Override
