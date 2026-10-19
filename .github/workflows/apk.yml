@@ -23,11 +23,12 @@ jobs:
         run: |
           mkdir -p apk
           cp android/app/build/outputs/apk/release/app-release.apk apk/TStore.apk
+          cp android/admin/build/outputs/apk/release/admin-release.apk apk/TStoreAdmin.apk
           git config user.name "apk-bot"
           git config user.email "apk-bot@users.noreply.github.com"
-          git add apk/TStore.apk
+          git add apk/TStore.apk apk/TStoreAdmin.apk
           git commit -m "APK build ${{ github.run_number }}" || exit 0
           git pull --rebase origin main
           git push origin HEAD:main
       - uses: actions/upload-artifact@v4
-        with: { name: TStore-apk, path: apk/TStore.apk }
+        with: { name: TStore-apk, path: apk/*.apk }
