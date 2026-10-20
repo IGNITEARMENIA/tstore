@@ -57,6 +57,7 @@ section{scroll-margin-top:70px}
 .dots button{width:7px;height:7px;border-radius:50%;border:0;padding:0;background:var(--line)}
 .dots button[aria-current="true"]{background:var(--accent);width:18px;border-radius:4px}
 
+.ig-ov{position:fixed;inset:0;z-index:200;pointer-events:none;overflow:hidden}.ig-bg{position:absolute;inset:0;background:#0b0b0d;opacity:0}.ig-glow{position:absolute;left:50%;top:50%;width:70vmin;height:70vmin;margin:-35vmin 0 0 -35vmin;border-radius:50%;background:radial-gradient(circle,rgba(242,109,130,.55),rgba(242,109,130,0) 65%);opacity:0}.ig-logo{position:absolute;transform-origin:50% 38%;-webkit-mask:var(--m) center/contain no-repeat;mask:var(--m) center/contain no-repeat;will-change:transform}.ig-word{position:absolute;left:0;right:0;top:calc(50% + 22vmin);text-align:center;color:#f26d82;font-family:var(--display);font-weight:700;font-size:clamp(18px,4vmin,30px);letter-spacing:.25em;opacity:0;text-shadow:0 0 18px rgba(242,109,130,.6)}
 .lgt{display:flex;flex-direction:column;line-height:1.05;min-width:0}.lgt small{font-family:var(--body);font-size:11px;font-weight:700;letter-spacing:0;opacity:.75;margin-top:2px}.b3{padding-top:12px}.totop{position:fixed;right:16px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:30;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--surface,#fff);color:var(--fg);box-shadow:0 6px 18px rgba(0,0,0,.18);display:grid;place-items:center;cursor:pointer;opacity:0;transform:translateY(12px) scale(.9);pointer-events:none;transition:opacity .2s,transform .2s,bottom .2s}.totop.on{opacity:1;transform:none;pointer-events:auto}.totop.up{bottom:calc(86px + env(safe-area-inset-bottom,0px))}.totop:hover{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .hero{padding-block:22px 6px}
 .hero h1{font-family:var(--display);font-weight:700;font-size:clamp(22px,4.4vw,40px);line-height:1.12;margin:0;text-wrap:balance;max-width:22ch}
@@ -1414,7 +1415,7 @@ function fxInit(){
   var vis=st.products.filter(pShown),inS=vis.filter(inStock);
   function pick(lineIds){return vis.find(function(p){return lineIds.indexOf(p.l)>=0&&p.img&&inStock(p)})}
   var subsLogo=st.subs.filter(function(s){return s.img&&!s.h&&s.c==="tob"});
-  var items=[["ig","IGNITE","cat:ign"],["t","T STORE","#catalog"],["klint","KLINT","cat:snus"]];
+  var items=[["ig","IGNITE","ignite"],["t","T STORE","#catalog"],["klint","KLINT","cat:snus"]];
   var marq=document.createElement("div");marq.className="fx-marq";
   var one=items.map(function(x){var r=L[x[0]];var w=x[0]==="ig"?66:x[0]==="t"?26:110;return '<button class="fx-logo" data-go="'+x[2]+'" aria-label="'+x[1]+'" style="--m:url('+r+');width:'+w+'px;'+(x[0]==="ig"?"height:36px":"")+'"></button>'}).join("")+
     subsLogo.map(function(s){return '<button class="fx-word" data-go="sub:'+esc(s.id)+'">'+esc(s.n.toUpperCase())+'</button>'}).join("");
@@ -1463,7 +1464,7 @@ function fxInit(){
   }
 
   // events
-  marq.addEventListener("click",function(e){var b=e.target.closest("[data-go]");if(!b)return;var g=b.dataset.go;if(g==="#catalog")cat.scrollIntoView({block:"start"});else goLink(g)});
+  marq.addEventListener("click",function(e){var b=e.target.closest("[data-go]");if(!b)return;var g=b.dataset.go;if(g==="ignite"){enterIgnite(b);return}if(g==="#catalog")cat.scrollIntoView({block:"start"});else goLink(g)});
   document.addEventListener("click",function(e){var b=e.target.closest(".fx-row [data-pid]");if(b)openProduct(b.dataset.pid)});
   $("#grid").addEventListener("pointermove",function(e){var c=e.target.closest(".card");if(!c)return;var r=c.getBoundingClientRect();c.style.setProperty("--gx",(e.clientX-r.left)+"px");c.style.setProperty("--gy",(e.clientY-r.top)+"px")});
   var ticking=false;
@@ -1472,6 +1473,30 @@ function fxInit(){
   addEventListener("scroll",function(){if(!ticking){ticking=true;requestAnimationFrame(onScroll)}},{passive:true});onScroll();
   var ttb=$("#toTop");if(ttb)ttb.addEventListener("click",function(){window.scrollTo({top:0,behavior:reduced()?"auto":"smooth"})});
 
+}
+
+var IG_URL="https://am.ignite.co";
+function enterIgnite(btn){
+  var framed=false;try{framed=window.top!==window.self}catch(x){framed=true}
+  var inApp=/TStoreApp/.test(navigator.userAgent);
+  function go(){if(framed||inApp){if(!framed)location.href=IG_URL}else location.href=IG_URL}
+  if(framed){try{window.open(IG_URL,"_blank","noopener")}catch(x){}}
+  if(reduced()||!document.body.animate){if(!framed)go();return}
+  var r=btn.getBoundingClientRect(),W=innerWidth,H=innerHeight;
+  var ov=document.createElement("div");ov.className="ig-ov";
+  ov.innerHTML='<div class="ig-bg"></div><div class="ig-glow"></div><div class="ig-logo"></div>';
+  document.body.appendChild(ov);
+  var lg=ov.querySelector(".ig-logo"),bg=ov.querySelector(".ig-bg"),gl=ov.querySelector(".ig-glow");
+  lg.style.cssText="left:"+r.left+"px;top:"+r.top+"px;width:"+r.width+"px;height:"+r.height+"px;--m:url("+FXLOGOS.ig+")";
+  var cx=W/2-(r.left+r.width/2),cy=H/2-(r.top+r.height/2),k=Math.min(W*.5/r.width,H*.3/r.height);
+  var t1={duration:650,easing:"cubic-bezier(.2,.8,.2,1)",fill:"forwards"};
+  bg.animate([{opacity:0},{opacity:.92}],{duration:500,fill:"forwards"});
+  lg.animate([{transform:"translate(0,0) scale(1)",background:getComputedStyle(btn).backgroundColor},{transform:"translate("+cx+"px,"+cy+"px) scale("+k+")",background:"#f26d82",offset:1}],t1).finished.then(function(){
+    gl.animate([{opacity:0,transform:"scale(.4)"},{opacity:1,transform:"scale(1.4)"}],{duration:700,easing:"ease-out",fill:"forwards"});
+    return lg.animate([{transform:"translate("+cx+"px,"+cy+"px) scale("+k+")",background:"#f26d82"},{transform:"translate("+cx+"px,"+cy+"px) scale("+(k*1.15)+")",background:"#f26d82",offset:.35},{transform:"translate("+cx+"px,"+cy+"px) scale("+(k*90)+")",background:"#0b0b0d"}],{duration:1300,delay:200,easing:"cubic-bezier(.6,0,.8,.15)",fill:"forwards"}).finished})
+  .then(function(){bg.style.background="#0b0b0d";bg.animate([{opacity:.92},{opacity:1}],{duration:150,fill:"forwards"});
+    if(framed){setTimeout(function(){ov.animate([{opacity:1},{opacity:0}],{duration:500,fill:"forwards"}).finished.then(function(){ov.remove()})},700)}else go()});
+  addEventListener("pageshow",function f(){ov.remove();removeEventListener("pageshow",f)});
 }
 function hscroll(row,box){
   function upd(){var max=row.scrollWidth-row.clientWidth-2;box.querySelector(".fx-arrow.l").disabled=row.scrollLeft<=2;box.querySelector(".fx-arrow.r").disabled=row.scrollLeft>=max}
