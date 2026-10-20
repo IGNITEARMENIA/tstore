@@ -1,5 +1,4 @@
 android
-apk
 dist
 .github
 .git
@@ -8,3 +7,4 @@ wrangler.jsonc
 *.md
 .gitignore
 .nojekyll
+apk/TStoreAdmin.apk
