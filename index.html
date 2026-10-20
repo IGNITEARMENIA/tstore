@@ -1,4 +1,5 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>T Store</title>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>T Store</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;600;700;800&family=Noto+Sans+Armenian:wght@400;600;700;800&display=swap">
 <style id="css">
 /* Layout: mobile-first shop. Sticky brand-brown header, swipeable ad banner, brand strip, sticky filter rail, 2-col product grid (3-5 on wider screens), bottom-sheet product view, owner-only admin overlay */
@@ -528,9 +529,11 @@ var pwaPrompt=null;addEventListener("beforeinstallprompt",function(e){e.preventD
 function pwaFramed(){try{return window.top!==window.self}catch(x){return true}}
 function isStandalone(){return (window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true||/TStoreApp/.test(navigator.userAgent)}
 function isIOS(){return /iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1)}
+function isIOSSafari(){var u=navigator.userAgent;return isIOS()&&/Safari\//.test(u)&&/Version\//.test(u)&&!/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|YaBrowser|DuckDuckGo|Ddg|GSA\/|Instagram|FBAN|FBAV|Line\/|Telegram|Snapchat|Brave|Mercury|TStoreApp/i.test(u)}
+function canInstall(){if(isStandalone()||pwaFramed())return false;if(isIOS())return isIOSSafari();return true}
 function installApp(){
   if(pwaPrompt){pwaPrompt.prompt();(pwaPrompt.userChoice||Promise.resolve()).then(function(){pwaPrompt=null});return}
-  if(isIOS()){showIosHint();return}
+  if(isIOS()){if(isIOSSafari())showIosHint();return}
   toast(tU("Откройте меню браузера ⋮ и выберите «Установить приложение» или «Добавить на главный экран»"))}
 function showIosHint(){if($("#iosHint"))return;
   var d=document.createElement("div");d.id="iosHint";d.className="ioshint";d.setAttribute("role","dialog");
@@ -540,7 +543,7 @@ function showIosHint(){if($("#iosHint"))return;
   document.body.appendChild(d);
   function close(){d.remove();try{localStorage.setItem("tpwaHint","1")}catch(x){}}
   d.addEventListener("click",function(e){if(e.target===d||e.target.closest(".ih-x"))close()})}
-setTimeout(function(){try{if(isIOS()&&!isStandalone()&&!pwaFramed()&&!localStorage.getItem("tpwaHint")&&!document.querySelector(".sheet:not([hidden])"))showIosHint()}catch(x){}},20000);
+setTimeout(function(){try{if(isIOSSafari()&&!isStandalone()&&!pwaFramed()&&!localStorage.getItem("tpwaHint")&&!document.querySelector(".sheet:not([hidden])"))showIosHint()}catch(x){}},20000);
 var TITLE="T Store";
 var RESET=":root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}";
 var FONTS='<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;600;700;800&family=Noto+Sans+Armenian:wght@400;600;700;800&display=swap">';
@@ -897,7 +900,7 @@ function openMenu(){
   openSheet(tU('<h2>Меню</h2>')+langPick("lngseg lngmenu")+tU('<div class="mnav">')+visCats().map(function(c){var n=st.products.filter(function(p){return pShown(p)&&pCat(p)===c.id&&inStock(p)}).length;
     return '<button data-k="mcat" data-c="'+esc(c.id)+'"><span>'+esc(c.n)+'</span><small>'+(n?n+tU(" в наличии"):tU("скоро"))+'</small></button>'}).join("")+
    tU('<button data-k="mnew" class="mnew"><span>Новинки</span><small>NEW</small></button></div>')+
-   tU('<div class="mnav mlinks"><button data-k="mgo" data-h="#about"><span>О магазине</span></button><button data-k="mgo" data-h="#contacts"><span>Контакты</span></button>')+(isStandalone()||pwaFramed()?"":'<button data-k="minstall" class="minst"><span>'+tU("📲 Установить приложение")+'</span></button>')+'</div>'+
+   tU('<div class="mnav mlinks"><button data-k="mgo" data-h="#about"><span>О магазине</span></button><button data-k="mgo" data-h="#contacts"><span>Контакты</span></button>')+(!canInstall()?"":'<button data-k="minstall" class="minst"><span>'+tU("📲 Установить приложение")+'</span></button>')+'</div>'+
    '<div class="mcontact">'+(t.address?tU('<p><small>Адрес</small><b>')+'<a class="maplink" href="'+esc(mapUrl())+'" target="_blank" rel="noopener">📍 '+esc(t.address)+'</a></b></p>':'')+(t.hours?tU('<p><small>Часы работы</small><b>')+esc(t.hours)+'</b></p>':'')+
    (d.length>6?'<div class="acts"><a class="btn main" href="'+waUrl(tU("Здравствуйте! Пишу с сайта ")+(t.brand||"T Store")+".")+tU('" target="_blank" rel="noopener">Написать в WhatsApp</a><a class="btn" href="tel:+')+d+tU('">Позвонить ')+esc(t.phone)+'</a></div>':'')+'</div>',tU("Меню"));
 }
