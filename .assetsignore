@@ -1,0 +1,10 @@
+android
+apk
+dist
+.github
+.git
+wrangler.jsonc
+.assetsignore
+*.md
+.gitignore
+.nojekyll

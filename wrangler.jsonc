@@ -1,6 +1,6 @@
 {
-  // Cloudflare: publish only the website (index.html), not the Android files
+  // Cloudflare: publish the website (index.html, sw.js, pwa/) — Android files are excluded in .assetsignore
   "name": "tstore",
   "compatibility_date": "2026-10-01",
-  "assets": { "directory": "./dist", "not_found_handling": "single-page-application" }
+  "assets": { "directory": "./", "not_found_handling": "single-page-application" }
 }
