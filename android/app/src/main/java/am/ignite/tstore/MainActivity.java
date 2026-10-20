@@ -24,8 +24,10 @@ import android.view.Gravity;
 import android.widget.FrameLayout;
 
 public class MainActivity extends Activity {
-    private static final String HOME = "https://tstore.tstore.workers.dev/";
-    private static final String HOST = "tstore.tstore.workers.dev";
+    private static final String HOME = "https://tstore.am/";
+    private static final String HOST = "tstore.am";
+    private static final String HOST2 = "www.tstore.am";
+    private static final String HOST3 = "tstore.tstore.workers.dev";
     private static final String OLD_HOST = "ignitearmenia.github.io";
     private WebView web;
     private View offline;
@@ -92,7 +94,7 @@ public class MainActivity extends Activity {
     private boolean handle(Uri u) {
         String scheme = u.getScheme() == null ? "" : u.getScheme();
         String host = u.getHost() == null ? "" : u.getHost();
-        if ((scheme.equals("https") || scheme.equals("http")) && (host.equals(HOST) || host.equals(OLD_HOST))) return false;
+        if ((scheme.equals("https") || scheme.equals("http")) && (host.equals(HOST) || host.equals(HOST2) || host.equals(HOST3) || host.equals(OLD_HOST))) return false;
         try {
             Intent i;
             if (scheme.equals("intent")) {
