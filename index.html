@@ -1484,7 +1484,7 @@ function ig2Build(after){
   sec.querySelector(".ig2-sw").addEventListener("click",function(e){var b=e.target.closest("[data-c]");if(!b)return;auto=false;var n=+b.dataset.c;setC(n,n>ci?1:-1)});
   var sx=null;cs.addEventListener("pointerdown",function(e){sx=e.clientX});cs.addEventListener("pointerup",function(e){if(sx==null)return;var d=e.clientX-sx;sx=null;if(Math.abs(d)>30){auto=false;setC(ci+(d<0?1:-1),d<0?1:-1)}});
   cs.addEventListener("click",function(e){if(sx===null&&e.detail){} });
-  sec.querySelector(".ig2-go").addEventListener("click",function(){var r=$("#fxIgRow");if(r)r.closest(".fx-show").scrollIntoView({block:"start",behavior:red?"auto":"smooth"})});
+  sec.querySelector(".ig2-go").addEventListener("click",function(){goLink("cat:ign")});
 }
 function fxInit(){
   var L=FXLOGOS,root=document.documentElement;
@@ -1522,13 +1522,9 @@ function fxInit(){
   var ig=(function(){var seen={},o=[];vis.forEach(function(p){if(pCat(p)!=="ign"||!p.img)return;var k=pSub(p);if((seen[k]||0)<2){seen[k]=(seen[k]||0)+1;o.push(p)}});return o})();
   var cat=$("#catalog");
   if(ig.length){
-    var s1=document.createElement("section");s1.className="fx-show fx-reveal";s1.id="fxIgnite";
-    s1.innerHTML=tU('<canvas id="fxSparks"></canvas><div class="fx-iglogo" role="img" aria-label="IGNITE"></div><div class="fx-eyebrow" style="margin-top:14px;color:#f26d82">Where bold begins</div><h2>Устройства и жидкости IGNITE</h2><p class="lead">От компактных V10 до V250 на 25 000 затяжек. Нажмите на модель, чтобы увидеть подробности и добавить в корзину.</p>')+
-     tU('<div class="fx-rowwrap"><button class="fx-arrow l" data-dir="-1" aria-label="Назад">‹</button><div class="fx-row" id="fxIgRow">')+ig.map(tileHtml).join("")+tU('</div><button class="fx-arrow r" data-dir="1" aria-label="Вперёд">›</button></div>');
-    cat.after(s1);
+    var s1=document.createElement("div");cat.after(s1);
     try{ig2Build(s1)}catch(e){console.error("ig2",e)}
-    sparks($("#fxSparks"),s1);
-    hscroll($("#fxIgRow"),s1);
+    s1.remove();s1=$("#ig2");
   }
   // KLINT strength picker
   var kl=vis.filter(function(p){return p.l==="klint"});
