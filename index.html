@@ -828,7 +828,8 @@ function renderNav(){
   var lines=ui.sub!=="all"?st.lines.filter(function(l){return lineSub(l)===ui.sub&&vis.some(function(p){return p.l===l.id})}):[];
   var hasNew=vis.some(function(p){return p.nw&&(ui.cat==="__all"||pCat(p)===ui.cat)});
   var h=(ui.cat==="__all"?tU('<button class="chip" data-c="x">✕ Новинки</button>'):'');
-  if(lines.length>1){h+='<button class="chip lineChip" data-c="line" data-l="all" aria-pressed="'+(ui.line==="all")+tU('">Все линейки</button>')+lines.map(function(l){return '<button class="chip lineChip" data-c="line" data-l="'+esc(l.id)+'" aria-pressed="'+(ui.line===l.id)+'">'+esc(l.short||l.name)+'</button>'}).join("")}
+  if(lines.length>1&&!lines.some(function(l){return l.id===ui.line}))ui.line=lines[0].id;
+  if(lines.length>1){h+=lines.map(function(l){return '<button class="chip lineChip" data-c="line" data-l="'+esc(l.id)+'" aria-pressed="'+(ui.line===l.id)+'">'+esc(l.short||l.name)+'</button>'}).join("")}
   if(hasNew&&ui.cat!=="__all")h+='<button class="chip nwchip" data-c="new" aria-pressed="'+ui.nw+'">NEW</button>';
   h+='<button class="chip" data-c="stock" aria-pressed="'+ui.stock+'">'+tU('В наличии</button>');
   $("#flt").innerHTML=h;$("#flt").hidden=needPick();
