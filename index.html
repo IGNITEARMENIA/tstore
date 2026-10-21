@@ -1667,17 +1667,32 @@ window.fxInit=fxInit;fxInit();
 })();
 </script>
 <style id="cats-big">
-/* Bigger, clearer category buttons */
-html:root .cats,html:root[data-pal] .cats{flex-wrap:wrap;gap:10px;overflow:visible;margin-inline:0;padding:4px 0 6px}
-html:root .cats::before{content:"Выберите категорию";flex-basis:100%;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+/* Catalogue: big category buttons + full-width brand tiles */
+html:root .cats,html:root[data-pal] .cats{display:flex!important;flex-wrap:wrap!important;gap:12px;overflow:visible;margin:4px 0 0!important;padding:0!important}
+html:root .cats::before{content:"Выберите категорию";flex-basis:100%;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
 html[lang="hy"] .cats::before{content:"Ընտրեք կատեգորիան"}
-html:root .cat,html:root[data-pal] .cat{min-height:52px;padding:13px 22px!important;font-size:15.5px!important;font-weight:700;border-radius:14px!important;border:2px solid #d9cdbd!important;background:#fff!important;color:#2b1f1a!important;box-shadow:0 1px 3px rgba(43,31,26,.08)!important;transition:transform .15s,background .2s,box-shadow .2s;display:inline-flex;align-items:center;gap:8px}
+html[lang="en"] .cats::before{content:"Choose a category"}
+html:root .cat,html:root[data-pal] .cat{flex:1 1 150px;min-height:64px;padding:14px 18px!important;font-size:17px!important;font-weight:800;border-radius:18px!important;border:2px solid #e3d8ca!important;background:#fff!important;color:#2b1f1a!important;box-shadow:0 2px 6px rgba(43,31,26,.06)!important;transition:transform .15s,border-color .2s,box-shadow .2s,background .2s;display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;white-space:normal;line-height:1.15}
 html[lang="hy"] .cat{font-family:"Noto Sans Armenian",var(--body)!important;letter-spacing:0!important}
-html:root .cat:hover{border-color:#754d43!important}
+html:root .cat:hover{border-color:#2b1f1a!important;box-shadow:0 8px 18px -10px rgba(43,31,26,.35)!important}
 html:root .cat:active{transform:scale(.97)}
-html:root .cat[aria-pressed="true"],html:root[data-pal] .cat[aria-pressed="true"]{background:#754d43!important;border-color:#754d43!important;color:#fff!important;box-shadow:0 8px 20px -8px rgba(117,77,67,.7)!important}
-html:root .cat[aria-pressed="true"]::before{content:"✓";font-weight:800;font-size:15px}
-@media (max-width:420px){html:root .cat,html:root[data-pal] .cat{flex:1 1 auto;justify-content:center;padding:12px 16px!important;font-size:15px!important}}
+html:root .cat[aria-pressed="true"],html:root[data-pal] .cat[aria-pressed="true"]{background:#2b1f1a!important;border-color:#2b1f1a!important;color:#fff!important;box-shadow:0 10px 24px -10px rgba(43,31,26,.6)!important}
+html:root .cat[aria-pressed="true"]::before{content:none}
+html:root .subs,html:root[data-pal] .subs{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))!important;gap:16px!important;overflow:visible!important;margin:20px 0 0!important;padding:0!important}
+html:root .sub,html:root[data-pal] .sub{width:100%;padding:12px!important;border-radius:22px!important;border:2px solid #ece3d7!important;background:#fff!important;gap:4px!important;transition:transform .2s,box-shadow .2s,border-color .2s}
+html:root .sub:hover{transform:translateY(-3px);border-color:#d9cdbd!important;box-shadow:0 16px 30px -18px rgba(43,31,26,.45)}
+html:root .sub[aria-pressed="true"],html:root[data-pal] .sub[aria-pressed="true"]{border-color:#2b1f1a!important;box-shadow:0 0 0 1px #2b1f1a!important}
+html:root .sub .bimg{width:100%!important;aspect-ratio:4/3!important;height:auto!important;border-radius:14px!important;background:#fff;overflow:hidden}
+html:root .sub .bimg img{width:100%!important;height:100%!important;object-fit:contain!important;padding:12%;box-sizing:border-box}
+html:root .sub b{font-size:19px!important;margin-top:8px;padding-inline:6px!important}
+html:root .sub small{font-size:14px!important;padding-inline:6px!important;padding-bottom:4px}
+@media (max-width:640px){
+ html:root .cats,html:root[data-pal] .cats{gap:10px}
+ html:root .cat,html:root[data-pal] .cat{flex-basis:40%!important;min-height:58px;font-size:16px!important;padding:12px!important}
+ html:root .subs,html:root[data-pal] .subs{grid-template-columns:1fr 1fr!important;gap:12px!important}
+ html:root .sub b{font-size:16px!important}
+ html:root .sub small{font-size:13px!important}
+}
 </style>
 <style id="tr-groups">
 .trg{display:flex;flex-wrap:wrap;gap:8px}
