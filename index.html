@@ -815,9 +815,10 @@ function startAuto(){clearInterval(autoT);if(!autoOn||topBanners().length<2)retu
   autoT=setInterval(function(){if(!document.hidden)goSlide(ui.slide+1)},5000)}
 function stopAuto(){autoOn=false;clearInterval(autoT)}
 
+var CICO={"tob": "<svg viewBox=\"0 0 32 32\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M13 3h6\"/><path d=\"M14 3v5h4V3\"/><path d=\"M12 8h8l-1 3h-6z\"/><path d=\"M16 11v5\"/><path d=\"M11 29h10a5 5 0 0 0 0-10h-10a5 5 0 0 0 0 10z\"/><path d=\"M21 22c3 0 4-2 6-2s2 3 0 4\"/></svg>", "ign": "<svg viewBox=\"0 0 32 32\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"10\" y=\"9\" width=\"12\" height=\"20\" rx=\"4\"/><path d=\"M13 9V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4\"/><path d=\"M14 15h4\"/><circle cx=\"16\" cy=\"23\" r=\"1.5\"/></svg>", "snus": "<svg viewBox=\"0 0 32 32\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><ellipse cx=\"16\" cy=\"11\" rx=\"11\" ry=\"4\"/><path d=\"M5 11v8c0 2.2 4.9 4 11 4s11-1.8 11-4v-8\"/><path d=\"M11 11.5h10\"/></svg>", "teq": "<svg viewBox=\"0 0 32 32\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M14 3h4v5l2 3v16a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V11l2-3z\"/><path d=\"M12 15h8v7h-8z\"/><path d=\"M14 5h4\"/></svg>", "acc": "<svg viewBox=\"0 0 32 32\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"5\" y=\"5\" width=\"9\" height=\"9\" rx=\"2\"/><rect x=\"18\" y=\"5\" width=\"9\" height=\"9\" rx=\"2\"/><rect x=\"5\" y=\"18\" width=\"9\" height=\"9\" rx=\"2\"/><path d=\"M22.5 18v9M18 22.5h9\"/></svg>", "_": "<svg viewBox=\"0 0 32 32\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><rect x=\"5\" y=\"5\" width=\"9\" height=\"9\" rx=\"2\"/><rect x=\"18\" y=\"5\" width=\"9\" height=\"9\" rx=\"2\"/><rect x=\"5\" y=\"18\" width=\"9\" height=\"9\" rx=\"2\"/><path d=\"M22.5 18v9M18 22.5h9\"/></svg>"};
 function renderNav(){
   if(ui.cat!=="__all"&&!catById(ui.cat))ui.cat=firstCat();
-  $("#cats").innerHTML=visCats().map(function(c){return '<button class="cat" role="tab" data-c="'+esc(c.id)+'" aria-pressed="'+(ui.cat===c.id)+'">'+esc(c.n)+'</button>'}).join("");
+  $("#cats").innerHTML=visCats().map(function(c){return '<button class="cat" role="tab" data-c="'+esc(c.id)+'" aria-pressed="'+(ui.cat===c.id)+'"><i class="cico" aria-hidden="true">'+(CICO[c.id]||CICO._)+'</i><span>'+esc(c.n)+'</span></button>'}).join("");
   var subs=ui.cat==="__all"?[]:visSubs(ui.cat);
   var vis=st.products.filter(pShown);
   $("#subs").hidden=subs.length<2&&!(subs.length===1&&subs[0].img);
@@ -1692,6 +1693,18 @@ html:root .sub small{font-size:14px!important;padding-inline:6px!important;paddi
  html:root .subs,html:root[data-pal] .subs{grid-template-columns:1fr 1fr!important;gap:12px!important}
  html:root .sub b{font-size:16px!important}
  html:root .sub small{font-size:13px!important}
+}
+
+html:root .cat,html:root[data-pal] .cat{flex-direction:column!important;gap:8px!important;min-height:104px!important;padding:14px 10px!important;font-size:14.5px!important;line-height:1.2!important}
+html:root .cat .cico{display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:#f4ede3;color:#2b1f1a;flex:none;transition:background .2s,color .2s,transform .2s}
+html:root .cat .cico svg{width:28px;height:28px}
+html:root .cat:hover .cico{transform:translateY(-2px)}
+html:root .cat[aria-pressed="true"] .cico{background:rgba(255,255,255,.14);color:#fff}
+html:root .cat span{display:block;max-width:100%;overflow-wrap:anywhere}
+@media (max-width:640px){
+ html:root .cat,html:root[data-pal] .cat{flex-basis:28%!important;min-height:96px!important;padding:12px 6px!important;font-size:13px!important}
+ html:root .cat .cico{width:42px;height:42px}
+ html:root .cat .cico svg{width:26px;height:26px}
 }
 </style>
 <style id="tr-groups">
