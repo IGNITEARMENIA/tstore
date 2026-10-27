@@ -1,4 +1,5 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,-apple-system,sans-serif;background:#fafaf9}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>T Store</title>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>T Store</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;600;700;800&family=Noto+Sans+Armenian:wght@400;600;700;800&display=swap">
 <style id="css">
 /* Layout: mobile-first shop. Sticky brand-brown header, swipeable ad banner, brand strip, sticky filter rail, 2-col product grid (3-5 on wider screens), bottom-sheet product view, owner-only admin overlay */
@@ -1049,8 +1050,9 @@ var CICO={"tob": "<svg viewBox=\"0 0 32 32\" fill=\"none\" stroke=\"currentColor
 function renderNav(){
   if(ui.cat!=="__all"&&!catById(ui.cat))ui.cat=firstCat();
   $("#cats").innerHTML=visCats().map(function(c){return '<button class="cat" role="tab" data-c="'+esc(c.id)+'" aria-pressed="'+(ui.cat===c.id)+'"><i class="cico" aria-hidden="true">'+(CICO[c.id]||CICO._)+'</i><span>'+esc(c.n)+'</span></button>'}).join("");
-  var subs=ui.cat==="__all"?[]:visSubs(ui.cat);
+  var subs=ui.cat==="__all"?[]:stockSubs(ui.cat);
   var vis=st.products.filter(pShown);
+  if(ui.sub!=="all"&&!subs.some(function(s){return s.id===ui.sub})&&visSubs(ui.cat).some(function(s){return s.id===ui.sub}))ui.sub="all";
   $("#subs").hidden=subs.length<2&&!(subs.length===1&&subs[0].img);
   $("#subs").innerHTML=""+
    subs.map(function(s){var ps=vis.filter(function(p){return pSub(p)===s.id});var n=ps.filter(inStock).length;
@@ -1090,7 +1092,8 @@ function cardHtml(p){var L=lineOf(p.l),x=priceOf(p),s=subById(pSub(p))||{};
    '<span class="info"><span class="ln">'+esc([L.brand||s.n,L.short].filter(Boolean).join(" · "))+'</span><span class="nmT">'+esc(p.n)+'</span><span class="fl">'+esc(p.f||"")+'</span>'+
    stockHtml(p)+'<span class="row">'+priceHtml(p)+'</span>'+buyHtml(p)+'</span></div>';
 }
-function needPick(){return ui.cat!=="__all"&&!ui.q.trim()&&visSubs(ui.cat).length>1&&ui.sub==="all"}
+function stockSubs(cid){var vis=st.products.filter(pShown);return visSubs(cid).filter(function(s){return vis.some(function(p){return pSub(p)===s.id&&inStock(p)})})}
+function needPick(){return ui.cat!=="__all"&&!ui.q.trim()&&stockSubs(ui.cat).length>1&&ui.sub==="all"}
 function renderGrid(){
   if(needPick()){$("#found").textContent="";$("#reset").hidden=true;$("#grid").innerHTML='<p class="empty pick">'+tU("👆 Выберите бренд выше, чтобы увидеть товары")+'</p>';return}
   var list=filtered();
