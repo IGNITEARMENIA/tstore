@@ -37,7 +37,8 @@ main{padding:8px 16px calc(30px + env(safe-area-inset-bottom));max-width:720px;m
 .sum{margin-left:auto;text-align:right;font-family:Unbounded,sans-serif;font-weight:700;font-size:16px;white-space:nowrap}
 .st{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:5px 10px;border-radius:999px;font-weight:800;font-size:12px;background:var(--soft)}
 .st i{width:8px;height:8px;border-radius:50%;background:currentColor}
-.s-new{color:#a35b12;background:#fff1e2}.s-ok{color:var(--blue);background:#e8f0ff}.s-paid{color:var(--ok);background:#e6f4e8}.s-go{color:#6b3fb8;background:#f0e9ff}.s-done{color:#3e4a3f;background:#e9ece9}.s-x{color:var(--red);background:#fbe9e7}
+.s-new{color:#a35b12;background:#fff1e2}.s-ok{color:var(--blue);background:#e8f0ff}.s-paid{color:var(--ok);background:#e6f4e8}.s-go{color:#6b3fb8;background:#f0e9ff}.s-done{color:#3e4a3f;background:#e9ece9}.s-x{color:var(--red);background:#fbe9e7}.s-wait{color:#6a5a12;background:#fbf3d0;margin-left:6px}.s-bell{color:#fff;background:#d9480f;margin-left:6px;animation:bl 1.6s ease-in-out infinite}@keyframes bl{50%{opacity:.65}}
+.o.hot{border:2px solid #d9480f}
 .who{margin-top:10px;display:grid;gap:4px;font-size:14px}
 .who b{font-weight:800}
 .row{display:flex;gap:8px;align-items:baseline}.row span:first-child{color:var(--muted);font-size:12px;min-width:66px}
@@ -122,30 +123,32 @@ function confirmTap(b,txt){if(b.dataset.sure==="1")return true;b.dataset.sure="1
 function inTab(o,t){var s=o.status;
   if(t==="all")return true;if(t==="new")return s==="Новый";if(t==="paid")return s==="Оплата получена"||s==="Передан курьеру";
   if(t==="done")return s==="Выдан"||s==="Передан курьеру"||s==="Отменён";
-  return s==="Новый"||s==="Одобрен"||s==="Оплата получена";}
+  return s==="Новый"||s==="Одобрен"||s==="Оплата получена"||needNotify(o);}
 function renderTabs(){$("#tabs").innerHTML=TABS.map(function(t){var n=S.orders.filter(function(o){return inTab(o,t[0])}).length;return '<button class="tab" data-t="'+t[0]+'" aria-pressed="'+(S.tab===t[0])+'">'+t[1]+(t[0]!=="all"?' <b>'+n+'</b>':'')+'</button>'}).join("")}
 
 function nextActs(o){
   var s=o.status,pk=isPick(o),cd=isCard(o)||!pk,a=[];
   if(s==="Новый")a.push(["Одобрен","✅ Одобрить заказ","main"]);
-  if(s==="Одобрен"&&cd&&!pk)a.push(["Оплата получена","💳 Оплата получена","main"]);
+  if(s==="Одобрен"&&cd&&!pk)a.push(["Оплата получена","Оплата получена (вручную)",""]);
   if(s==="Одобрен"&&pk)a.push(["Выдан","🛍 Выдан клиенту","main"]);
   if(s==="Оплата получена")a.push([pk?"Выдан":"Передан курьеру",pk?"🛍 Выдан клиенту":"🚕 Передан курьеру","main"]);
   if(s!=="Отменён"&&s!=="Выдан"&&s!=="Передан курьеру")a.push(["Отменён","Отменить","x"]);
   return a;
 }
+function lastLine(o){var h=String(o.hist||"").trim().split("\n");return h[h.length-1]||""}
+function needNotify(o){return (o.status==="Одобрен"||o.status==="Оплата получена"||o.status==="Передан курьеру")&&lastLine(o).indexOf("💬")<0}
 function card(o){
-  var cls=STATUS[o.status]||"s-new",pk=isPick(o);
-  return '<article class="o" data-no="'+esc(o.no)+'"><div class="oh"><div><div class="no">#'+esc(o.no)+'</div><div class="dt">'+esc(o.date)+(o.src?' · '+esc(o.src):'')+'</div></div><div class="sum">'+esc(o.total)+' <small style="font-size:11px">AMD</small></div></div>'+
-    '<span class="st '+cls+'"><i></i>'+esc(o.status)+'</span>'+
+  var cls=STATUS[o.status]||"s-new",pk=isPick(o),nn=needNotify(o),byCash=/кассир/.test(lastLine(o));
+  return '<article class="o'+(nn?' hot':'')+'" data-no="'+esc(o.no)+'"><div class="oh"><div><div class="no">#'+esc(o.no)+'</div><div class="dt">'+esc(o.date)+(o.src?' · '+esc(o.src):'')+'</div></div><div class="sum">'+esc(o.total)+' <small style="font-size:11px">AMD</small></div></div>'+
+    '<span class="st '+cls+'"><i></i>'+esc(o.status)+(byCash?' · кассир':'')+'</span>'+(o.status==="Одобрен"&&!pk?'<span class="st s-wait">⏳ ждём подтверждение кассира</span>':'')+(nn?'<span class="st s-bell">📣 Сообщите клиенту</span>':'')+
     '<div class="who"><div class="row"><span>Клиент</span><b>'+esc(o.name)+'</b></div>'+
     '<div class="row"><span>Телефон</span><a href="tel:'+esc(digits(o.phone)?"+"+digits(o.phone):"")+'">'+esc(o.phone)+'</a></div>'+
     '<div class="row"><span>'+(pk?"Получение":"Доставка")+'</span><div>'+esc(o.addr)+'</div></div>'+
     '<div class="row"><span>Оплата</span><div>'+esc(o.pay)+(isCard(o)&&(o.status==="Новый"||o.status==="Одобрен")?'<span class="tag card">ждём перевод</span>':'')+'</div></div>'+
     (o.note?'<div class="row"><span>Коммент.</span><div>'+esc(o.note)+'</div></div>':'')+'</div>'+
     '<details><summary>Товары · '+esc(o.n)+' шт.'+(o.off&&o.off!=="0"?' · скидка '+esc(o.off):'')+'</summary><p class="items">'+esc(o.items)+'</p>'+(o.hist?'<p class="hist">'+esc(o.hist)+'</p>':'')+'</details>'+
-    '<div class="acts">'+nextActs(o).map(function(a){return '<button class="btn '+a[2]+'" data-set="'+esc(a[0])+'">'+a[1]+'</button>'}).join("")+
-    '<button class="btn wa" data-wa="1">💬 Написать в WhatsApp</button></div></article>';
+    '<div class="acts">'+(nn?'<button class="btn wa main" data-wa="1">💬 Сообщить клиенту: '+esc(o.status)+'</button>':'')+nextActs(o).map(function(a){return '<button class="btn '+a[2]+'" data-set="'+esc(a[0])+'">'+a[1]+'</button>'}).join("")+
+    (nn?'':'<button class="btn wa" data-wa="1">💬 Написать в WhatsApp</button>')+'</div></article>';
 }
 function renderList(){
   var L=S.orders.filter(function(o){return inTab(o,S.tab)});
@@ -174,7 +177,8 @@ function askWa(o,st,title){
   function close(){el.remove()}
   el.onclick=function(e){if(e.target===el)close()};
   $("#wno").onclick=close;
-  $("#wgo").onclick=function(){var t=$("#wtx").value;window.open(waLink(o,t),"_blank","noopener");close()};
+  $("#wgo").onclick=function(){var t=$("#wtx").value;window.open(waLink(o,t),"_blank","noopener");close();
+    api({op:"note",no:o.no,txt:st}).then(function(r){if(r&&r.ok){o.hist=(o.hist?o.hist+"\n":"")+"сейчас — 💬 клиенту: "+st;renderTabs();renderList()}}).catch(function(){})};
 }
 function onAct(e){
   var b=e.target.closest("[data-set],[data-wa]");if(!b)return;
@@ -195,8 +199,10 @@ function refresh(first){
   return api({op:"list",limit:150}).then(function(r){
     if(rf)rf.classList.remove("spin");
     if(!r||!r.ok){if(r&&r.err==="pin"){ls("ops_pin",null);clearInterval(S.timer);lockView("Неверный PIN")}else if(first)lockView("Таблица заказов не отвечает. Обновите скрипт Google (см. инструкцию).");else toast("Не удалось обновить");return}
+    if(r.role==="cashier"){if(first){ls("cash_pin",S.pin);location.href="cash.html"}return}
     if(first){ls("ops_pin",S.pin);shell();clearInterval(S.timer);S.timer=setInterval(function(){if(!document.hidden&&!document.querySelector(".sheet"))refresh()},30000)}
-    var prev=S.orders.length?S.orders[0].no:null;S.orders=r.orders||[];
+    var prev=S.orders.length?S.orders[0].no:null,old={};S.orders.forEach(function(o){old[o.no]=o.status});S.orders=r.orders||[];
+    if(prev)S.orders.forEach(function(o){if(old[o.no]&&old[o.no]!=="Оплата получена"&&o.status==="Оплата получена"&&/кассир/.test(lastLine(o))){toast("💰 Кассир подтвердил оплату #"+o.no+" — сообщите клиенту");try{navigator.vibrate&&navigator.vibrate([80,60,80])}catch(x){}}});
     if(prev&&S.orders[0]&&S.orders[0].no!==prev)toast("🔔 Новый заказ #"+S.orders[0].no);
     $("#upd").textContent="Обновлено "+new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"})+" · авто каждые 30 с";
     renderTabs();renderList();

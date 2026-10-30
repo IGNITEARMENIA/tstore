@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#1f6b2b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="T Store Касса">
+<link rel="apple-touch-icon" href="pwa/icon-192.png">
+<link rel="icon" href="pwa/icon-192.png">
+<title>T Store Касса</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700&family=Manrope:wght@500;600;700;800&display=swap">
+<style>
+:root{--bg:#eef3ee;--ink:#1d2a1f;--muted:#66746a;--line:#d7e2d8;--green:#1f9d3a;--green2:#16802e;--soft:#f3f7f3}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Manrope,system-ui,sans-serif;-webkit-text-size-adjust:100%}
+button,input{font:inherit;color:inherit}
+.top{position:sticky;top:0;z-index:5;background:#1f6b2b;color:#fff;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;gap:10px}
+.top h1{font-family:Unbounded,sans-serif;font-size:17px;margin:0;flex:1}
+.top h1 small{display:block;font-family:Manrope,sans-serif;font-weight:600;font-size:11px;opacity:.75;margin-top:2px}
+.ib{border:0;background:rgba(255,255,255,.15);color:#fff;border-radius:12px;height:38px;min-width:38px;padding:0 12px;font-weight:800;cursor:pointer}
+.ib.spin svg{animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+main{padding:14px 16px calc(30px + env(safe-area-inset-bottom));max-width:620px;margin:0 auto;display:grid;gap:12px}
+h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:10px 2px 0}
+.o{background:#fff;border-radius:20px;padding:16px;border:1px solid var(--line);box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.oh{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.no{font-family:Unbounded,sans-serif;font-weight:700;font-size:15px}
+.dt{font-size:12px;color:var(--muted);margin-top:3px}
+.sum{font-family:Unbounded,sans-serif;font-weight:700;font-size:30px;margin:12px 0 2px;letter-spacing:-.01em}
+.sum small{font-size:14px;margin-left:4px}
+.who{font-size:15px;color:var(--muted)}.who b{color:var(--ink)}
+.pay{display:block;width:100%;margin-top:14px;border:0;border-radius:16px;min-height:62px;background:var(--green);color:#fff;font-weight:800;font-size:18px;cursor:pointer;box-shadow:0 6px 16px rgba(31,157,58,.3)}
+.pay:active{background:var(--green2)}
+.pay.sure{background:#0f5f22}
+.pay:disabled{opacity:.6}
+.done{background:var(--soft);border-style:dashed}
+.done .sum{font-size:20px;color:var(--muted)}
+.okb{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:6px 12px;border-radius:999px;background:#e3f4e6;color:var(--green2);font-weight:800;font-size:13px}
+.empty{text-align:center;color:var(--muted);padding:34px 10px;font-weight:700;background:#fff;border-radius:20px;border:1px dashed var(--line)}
+.lock{min-height:100vh;display:grid;place-items:center;padding:24px}
+.lock form{background:#fff;border-radius:22px;padding:26px 22px;width:100%;max-width:360px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.1)}
+.lock h2{font-family:Unbounded,sans-serif;font-size:20px;margin:6px 0 4px;text-transform:none;letter-spacing:0;color:var(--ink)}
+.lock p{color:var(--muted);font-size:14px;margin:0 0 16px}
+.lock input{width:100%;height:56px;border-radius:14px;border:1.5px solid var(--line);text-align:center;font-size:26px;letter-spacing:.4em;font-weight:800}
+.lock .go{width:100%;margin-top:12px;border:0;border-radius:14px;height:52px;background:var(--green);color:#fff;font-weight:800;font-size:16px;cursor:pointer}
+.err{color:#c0392b;font-weight:700;font-size:13px;min-height:18px;margin-top:10px}
+.toast{position:fixed;left:50%;top:calc(70px + env(safe-area-inset-top));transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:14px;padding:12px 16px;font-weight:800;font-size:14px;z-index:20;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:calc(100% - 32px)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function(){
+"use strict";
+var S={pin:"",hook:"",orders:[],timer:null};
+function $(s){return document.querySelector(s)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k)||"";if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){return ""}}
+function toast(m){var t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(function(){t.remove()},2400)}
+function loadShop(){
+  return fetch("index.html",{cache:"no-store"}).then(function(r){return r.text()}).then(function(h){
+    var a=h.indexOf('<script type="application/json" id="state">');if(a<0)throw new Error("state");
+    a=h.indexOf(">",a)+1;var b=h.indexOf("<\/script>",a);var st=JSON.parse(h.slice(a,b));S.hook=((st.shop||{}).hook||"").trim();
+  });
+}
+function api(params){
+  var u=S.hook+(S.hook.indexOf("?")<0?"?":"&")+Object.keys(params).map(function(k){return k+"="+encodeURIComponent(params[k])}).join("&")+"&key="+encodeURIComponent(S.pin)+"&_="+Date.now();
+  return fetch(u,{redirect:"follow"}).then(function(r){return r.json()});
+}
+function lockView(msg){
+  $("#app").innerHTML='<div class="lock"><form id="pf"><img src="pwa/icon-192.png" alt="" width="64" height="64" style="border-radius:16px"><h2>T Store Касса</h2><p>Подтверждение переводов на карту</p>'+
+    '<input id="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="8" placeholder="PIN" aria-label="PIN-код кассира"><button class="go" type="submit">Войти</button><div class="err" id="perr">'+esc(msg||"")+'</div></form></div>';
+  var i=$("#pin");setTimeout(function(){i.focus()},50);
+  $("#pf").onsubmit=function(e){e.preventDefault();S.pin=i.value.trim();if(!S.pin)return;$("#perr").textContent="Проверяем…";refresh(true)};
+}
+function shell(){
+  $("#app").innerHTML='<div class="top"><h1>Касса<small id="upd">—</small></h1><button class="ib" id="rf" aria-label="Обновить"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg></button><button class="ib" id="lo">Выйти</button></div><main id="list"></main>';
+  $("#rf").onclick=function(){refresh()};
+  $("#lo").onclick=function(){if(this.dataset.s!=="1"){this.dataset.s="1";this.textContent="Точно?";var b=this;setTimeout(function(){b.dataset.s="";b.textContent="Выйти"},2500);return}ls("cash_pin",null);S.pin="";clearInterval(S.timer);lockView()};
+  $("#list").onclick=onPay;
+}
+function render(){
+  var wait=S.orders.filter(function(o){return o.status==="Одобрен"||o.status==="Новый"}),done=S.orders.filter(function(o){return o.status==="Оплата получена"}).slice(0,15);
+  wait.sort(function(a,b){return (a.status==="Одобрен"?0:1)-(b.status==="Одобрен"?0:1)});
+  $("#list").innerHTML='<h2>Ждут перевода · '+wait.length+'</h2>'+(wait.length?wait.map(function(o){
+      return '<article class="o"><div class="oh"><div class="no">Заказ #'+esc(o.no)+'</div><div class="dt">'+esc(o.date)+'</div></div>'+
+        '<div class="sum">'+esc(o.total)+'<small>AMD</small></div><div class="who"><b>'+esc(o.name)+'</b> · телефон …'+esc(o.tail)+(o.status==="Новый"?' · <i>ещё не одобрен менеджером</i>':'')+'</div>'+
+        '<button class="pay" data-no="'+esc(o.no)+'" data-sum="'+esc(o.total)+'">✅ Деньги поступили</button></article>'}).join(""):'<div class="empty">Сейчас никто не ждёт подтверждения оплаты 👌</div>')+
+    (done.length?'<h2>Подтверждено</h2>'+done.map(function(o){return '<article class="o done"><div class="oh"><div class="no">#'+esc(o.no)+' · '+esc(o.name)+'</div><div class="dt">'+esc(o.date)+'</div></div><div class="sum">'+esc(o.total)+' AMD</div><span class="okb">✓ Оплата получена — менеджер сообщит клиенту</span></article>'}).join(""):"");
+}
+function onPay(e){
+  var b=e.target.closest(".pay");if(!b)return;
+  if(!b.classList.contains("sure")){b.classList.add("sure");b.textContent="Точно поступило "+b.dataset.sum+" AMD? Нажмите ещё раз";setTimeout(function(){if(b.isConnected&&!b.disabled){b.classList.remove("sure");b.textContent="✅ Деньги поступили"}},4000);return}
+  b.disabled=true;b.textContent="Сохраняем…";
+  api({op:"set",no:b.dataset.no,st:"Оплата получена"}).then(function(r){
+    if(!r||!r.ok){b.disabled=false;b.classList.remove("sure");b.textContent="✅ Деньги поступили";toast(r&&r.err==="pin"?"Неверный PIN":r&&r.err==="state"?"Заказ уже в статусе: "+r.status:"Не удалось сохранить — проверьте интернет");return}
+    var o=S.orders.find(function(x){return x.no===b.dataset.no});if(o)o.status="Оплата получена";
+    try{navigator.vibrate&&navigator.vibrate(60)}catch(x){}
+    toast("✓ Оплата по #"+b.dataset.no+" подтверждена");render();
+  }).catch(function(){b.disabled=false;b.classList.remove("sure");b.textContent="✅ Деньги поступили";toast("Нет связи с таблицей заказов")});
+}
+function refresh(first){
+  var rf=$("#rf");if(rf)rf.classList.add("spin");
+  return api({op:"list",limit:120}).then(function(r){
+    if(rf)rf.classList.remove("spin");
+    if(!r||!r.ok){if(r&&r.err==="pin"){ls("cash_pin",null);clearInterval(S.timer);lockView("Неверный PIN")}else if(first)lockView("Таблица заказов не отвечает.");else toast("Не удалось обновить");return}
+    if(r.role!=="cashier"&&first){toast("Это PIN менеджера — откроется приложение менеджера");setTimeout(function(){location.href="ops.html"},900);return}
+    if(first){ls("cash_pin",S.pin);shell();clearInterval(S.timer);S.timer=setInterval(function(){if(!document.hidden)refresh()},20000)}
+    var before=S.orders.filter(function(o){return o.status==="Одобрен"}).map(function(o){return o.no});
+    S.orders=r.orders||[];
+    var fresh=S.orders.filter(function(o){return o.status==="Одобрен"&&before.indexOf(o.no)<0});
+    if(!first&&fresh.length){toast("🔔 Ждём перевод: #"+fresh[0].no+" · "+fresh[0].total+" AMD");try{navigator.vibrate&&navigator.vibrate([80,60,80])}catch(x){}}
+    $("#upd").textContent="Обновлено "+new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"})+" · авто каждые 20 с";
+    render();
+  }).catch(function(){if(rf)rf.classList.remove("spin");if(first)lockView("Нет связи с таблицей заказов.");else toast("Нет связи")});
+}
+$("#app").innerHTML='<div class="empty" style="margin:40px 16px">Загрузка…</div>';
+loadShop().then(function(){
+  if(!/^https:\/\/script\.google\.com\//.test(S.hook)){$("#app").innerHTML='<div class="empty">Не указана ссылка Google Apps Script.</div>';return}
+  S.pin=ls("cash_pin");if(S.pin)refresh(true);else lockView();
+}).catch(function(){$("#app").innerHTML='<div class="empty">Не удалось загрузить настройки магазина.</div>'});
+document.addEventListener("visibilitychange",function(){if(!document.hidden&&S.pin&&$("#list"))refresh()});
+})();
+</script>
+</body>
+</html>
