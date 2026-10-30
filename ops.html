@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#2b1f1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="T Store Оператор">
+<link rel="apple-touch-icon" href="pwa/icon-192.png">
+<link rel="icon" href="pwa/icon-192.png">
+<title>T Store Оператор</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700&family=Manrope:wght@500;600;700;800&display=swap">
+<style>
+:root{--bg:#efe6da;--card:#fff;--ink:#2b1f1a;--muted:#7a6a5f;--line:#e3d8ca;--accent:#ff8a3d;--ok:#2f8a3a;--blue:#2d6cdf;--red:#c0392b;--soft:#f6f0e8}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Manrope,system-ui,sans-serif;-webkit-text-size-adjust:100%}
+button,input{font:inherit;color:inherit}
+.top{position:sticky;top:0;z-index:5;background:var(--ink);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;gap:10px}
+.top h1{font-family:Unbounded,sans-serif;font-size:17px;margin:0;flex:1;white-space:nowrap}
+.top h1 small{display:block;font-family:Manrope,sans-serif;font-weight:600;font-size:11px;opacity:.7;margin-top:2px}
+.ib{border:0;background:rgba(255,255,255,.12);color:#fff;border-radius:12px;height:38px;min-width:38px;padding:0 12px;font-weight:800;cursor:pointer}
+.ib.spin svg{animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+.tabs{position:sticky;top:calc(58px + env(safe-area-inset-top));z-index:4;background:var(--bg);display:flex;gap:8px;padding:10px 16px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;border:1px solid var(--line);background:#fff;border-radius:999px;height:36px;padding:0 14px;font-weight:800;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.tab b{min-width:20px;height:20px;border-radius:10px;background:var(--soft);display:inline-grid;place-items:center;font-size:11px;padding:0 5px}
+.tab[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}.tab[aria-pressed=true] b{background:var(--accent);color:var(--ink)}
+.search{margin:0 16px 4px;display:block;width:calc(100% - 32px);height:42px;border-radius:12px;border:1px solid var(--line);background:#fff;padding:0 14px;font-size:15px}
+main{padding:8px 16px calc(30px + env(safe-area-inset-bottom));max-width:720px;margin:0 auto;display:grid;gap:12px}
+.o{background:var(--card);border-radius:18px;padding:14px;box-shadow:0 1px 2px rgba(43,31,26,.06);border:1px solid var(--line)}
+.oh{display:flex;align-items:flex-start;gap:10px}
+.no{font-family:Unbounded,sans-serif;font-weight:700;font-size:16px}
+.dt{font-size:12px;color:var(--muted);margin-top:2px}
+.sum{margin-left:auto;text-align:right;font-family:Unbounded,sans-serif;font-weight:700;font-size:16px;white-space:nowrap}
+.st{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:5px 10px;border-radius:999px;font-weight:800;font-size:12px;background:var(--soft)}
+.st i{width:8px;height:8px;border-radius:50%;background:currentColor}
+.s-new{color:#a35b12;background:#fff1e2}.s-ok{color:var(--blue);background:#e8f0ff}.s-paid{color:var(--ok);background:#e6f4e8}.s-go{color:#6b3fb8;background:#f0e9ff}.s-done{color:#3e4a3f;background:#e9ece9}.s-x{color:var(--red);background:#fbe9e7}
+.who{margin-top:10px;display:grid;gap:4px;font-size:14px}
+.who b{font-weight:800}
+.row{display:flex;gap:8px;align-items:baseline}.row span:first-child{color:var(--muted);font-size:12px;min-width:66px}
+.tag{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:6px;background:var(--soft);margin-left:4px}
+.tag.card{background:#fff1e2;color:#a35b12}
+details{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+summary{cursor:pointer;font-weight:800;font-size:13px;color:var(--muted)}
+.items{white-space:pre-wrap;font-size:13px;line-height:1.45;margin:8px 0 0}
+.hist{white-space:pre-wrap;font-size:12px;color:var(--muted);margin:8px 0 0}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.btn{border:0;border-radius:12px;min-height:46px;padding:8px 10px;font-weight:800;font-size:14px;cursor:pointer;background:var(--soft);color:var(--ink);display:flex;align-items:center;justify-content:center;gap:6px;text-align:center;line-height:1.15}
+.btn.main{background:var(--ink);color:#fff;grid-column:1/-1}
+.btn.wa{background:#e6f4e8;color:#1f6b2b}
+.btn.x{background:#fbe9e7;color:var(--red)}
+.btn:disabled{opacity:.5}
+.empty{text-align:center;color:var(--muted);padding:40px 10px;font-weight:700}
+.lock{min-height:100vh;display:grid;place-items:center;padding:24px}
+.lock form{background:#fff;border-radius:22px;padding:26px 22px;width:100%;max-width:360px;text-align:center;box-shadow:0 10px 30px rgba(43,31,26,.12)}
+.lock h2{font-family:Unbounded,sans-serif;font-size:20px;margin:6px 0 4px}
+.lock p{color:var(--muted);font-size:14px;margin:0 0 16px}
+.lock input{width:100%;height:56px;border-radius:14px;border:1.5px solid var(--line);text-align:center;font-size:26px;letter-spacing:.4em;font-weight:800}
+.lock .btn{width:100%;margin-top:12px;background:var(--ink);color:#fff}
+.err{color:var(--red);font-weight:700;font-size:13px;min-height:18px;margin-top:10px}
+.toast{position:fixed;left:50%;top:calc(70px + env(safe-area-inset-top));transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:14px;padding:12px 16px;font-weight:800;font-size:14px;z-index:20;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:calc(100% - 32px)}
+.sheet{position:fixed;inset:0;z-index:15;background:rgba(20,14,12,.5);display:flex;align-items:flex-end;justify-content:center}
+.sheet>div{background:#fff;border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));width:100%;max-width:720px}
+.sheet h3{font-family:Unbounded,sans-serif;font-size:16px;margin:0 0 10px}
+.sheet textarea{font-family:inherit;width:100%;min-height:130px;border-radius:12px;border:1px solid var(--line);padding:10px 12px;font-size:14px;line-height:1.4;resize:vertical}
+.sheet .acts{grid-template-columns:1fr}
+.sheet .btn.main{grid-column:auto}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function(){
+"use strict";
+var STATUS={"Новый":"s-new","Одобрен":"s-ok","Оплата получена":"s-paid","Передан курьеру":"s-go","Выдан":"s-done","Отменён":"s-x"};
+var TABS=[["work","В работе"],["new","Новые"],["paid","Оплачены"],["done","Готово"],["all","Все"]];
+var S={pin:"",hook:"",card:"",cardName:"",cardBank:"",address:"",hours:"",orders:[],tab:"work",q:"",busy:false,timer:null};
+function $(s){return document.querySelector(s)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k)||"";if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch(e){return ""}}
+function toast(m){var t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(function(){t.remove()},2200)}
+function digits(s){return String(s||"").replace(/\D/g,"")}
+function cardFmt(){return digits(S.card).replace(/(\d{4})(?=\d)/g,"$1 ")}
+function isPick(o){return /самовывоз/i.test(o.addr||"")}
+function isCard(o){return /карт/i.test(o.pay||"")&&!/POS/i.test(o.pay||"")}
+
+/* settings come from the shop page itself, so the operator app always matches the site */
+function loadShop(){
+  return fetch("index.html",{cache:"no-store"}).then(function(r){return r.text()}).then(function(h){
+    var a=h.indexOf('<script type="application/json" id="state">');if(a<0)throw new Error("state");
+    a=h.indexOf(">",a)+1;var b=h.indexOf("<\/script>",a);var st=JSON.parse(h.slice(a,b));
+    var sh=st.shop||{},tx=st.texts||{};
+    S.hook=(sh.hook||"").trim();S.card=sh.card||"";S.cardName=sh.cardName||"";S.cardBank=sh.cardBank||"";S.address=tx.address||"";S.hours=tx.hours||"";
+  });
+}
+function api(params){
+  var u=S.hook+(S.hook.indexOf("?")<0?"?":"&")+Object.keys(params).map(function(k){return k+"="+encodeURIComponent(params[k])}).join("&")+"&key="+encodeURIComponent(S.pin)+"&_="+Date.now();
+  return fetch(u,{redirect:"follow"}).then(function(r){return r.json()});
+}
+
+function lockView(msg){
+  $("#app").innerHTML='<div class="lock"><form id="pf"><img src="pwa/icon-192.png" alt="" width="64" height="64" style="border-radius:16px"><h2>T Store Оператор</h2><p>Заказы, оплата и одобрение</p>'+
+    '<input id="pin" type="password" inputmode="numeric" autocomplete="current-password" maxlength="8" placeholder="PIN" aria-label="PIN-код"><button class="btn" type="submit">Войти</button><div class="err" id="perr">'+esc(msg||"")+'</div></form></div>';
+  var f=$("#pf"),i=$("#pin");setTimeout(function(){i.focus()},50);
+  f.onsubmit=function(e){e.preventDefault();S.pin=i.value.trim();if(!S.pin)return;$("#perr").textContent="Проверяем…";refresh(true)};
+}
+function shell(){
+  $("#app").innerHTML='<div class="top"><h1>Заказы<small id="upd">—</small></h1><button class="ib" id="rf" aria-label="Обновить"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg></button><button class="ib" id="lo">Выйти</button></div>'+
+    '<div class="tabs" id="tabs"></div><input class="search" id="q" type="search" placeholder="Поиск: номер, имя, телефон">'+
+    '<main id="list"></main>';
+  $("#rf").onclick=function(){refresh()};
+  $("#lo").onclick=function(){if(!confirmTap(this,"Точно выйти?"))return;ls("ops_pin",null);S.pin="";clearInterval(S.timer);lockView()};
+  $("#q").oninput=function(){S.q=this.value.trim().toLowerCase();renderList()};
+  $("#tabs").onclick=function(e){var b=e.target.closest(".tab");if(!b)return;S.tab=b.dataset.t;renderTabs();renderList();scrollTo(0,0)};
+  $("#list").onclick=onAct;
+}
+function confirmTap(b,txt){if(b.dataset.sure==="1")return true;b.dataset.sure="1";var o=b.textContent;b.textContent=txt;setTimeout(function(){b.dataset.sure="";b.textContent=o},2500);return false}
+
+function inTab(o,t){var s=o.status;
+  if(t==="all")return true;if(t==="new")return s==="Новый";if(t==="paid")return s==="Оплата получена"||s==="Передан курьеру";
+  if(t==="done")return s==="Выдан"||s==="Передан курьеру"||s==="Отменён";
+  return s==="Новый"||s==="Одобрен"||s==="Оплата получена";}
+function renderTabs(){$("#tabs").innerHTML=TABS.map(function(t){var n=S.orders.filter(function(o){return inTab(o,t[0])}).length;return '<button class="tab" data-t="'+t[0]+'" aria-pressed="'+(S.tab===t[0])+'">'+t[1]+(t[0]!=="all"?' <b>'+n+'</b>':'')+'</button>'}).join("")}
+
+function nextActs(o){
+  var s=o.status,pk=isPick(o),cd=isCard(o)||!pk,a=[];
+  if(s==="Новый")a.push(["Одобрен","✅ Одобрить заказ","main"]);
+  if(s==="Одобрен"&&cd&&!pk)a.push(["Оплата получена","💳 Оплата получена","main"]);
+  if(s==="Одобрен"&&pk)a.push(["Выдан","🛍 Выдан клиенту","main"]);
+  if(s==="Оплата получена")a.push([pk?"Выдан":"Передан курьеру",pk?"🛍 Выдан клиенту":"🚕 Передан курьеру","main"]);
+  if(s!=="Отменён"&&s!=="Выдан"&&s!=="Передан курьеру")a.push(["Отменён","Отменить","x"]);
+  return a;
+}
+function card(o){
+  var cls=STATUS[o.status]||"s-new",pk=isPick(o);
+  return '<article class="o" data-no="'+esc(o.no)+'"><div class="oh"><div><div class="no">#'+esc(o.no)+'</div><div class="dt">'+esc(o.date)+(o.src?' · '+esc(o.src):'')+'</div></div><div class="sum">'+esc(o.total)+' <small style="font-size:11px">AMD</small></div></div>'+
+    '<span class="st '+cls+'"><i></i>'+esc(o.status)+'</span>'+
+    '<div class="who"><div class="row"><span>Клиент</span><b>'+esc(o.name)+'</b></div>'+
+    '<div class="row"><span>Телефон</span><a href="tel:'+esc(digits(o.phone)?"+"+digits(o.phone):"")+'">'+esc(o.phone)+'</a></div>'+
+    '<div class="row"><span>'+(pk?"Получение":"Доставка")+'</span><div>'+esc(o.addr)+'</div></div>'+
+    '<div class="row"><span>Оплата</span><div>'+esc(o.pay)+(isCard(o)&&(o.status==="Новый"||o.status==="Одобрен")?'<span class="tag card">ждём перевод</span>':'')+'</div></div>'+
+    (o.note?'<div class="row"><span>Коммент.</span><div>'+esc(o.note)+'</div></div>':'')+'</div>'+
+    '<details><summary>Товары · '+esc(o.n)+' шт.'+(o.off&&o.off!=="0"?' · скидка '+esc(o.off):'')+'</summary><p class="items">'+esc(o.items)+'</p>'+(o.hist?'<p class="hist">'+esc(o.hist)+'</p>':'')+'</details>'+
+    '<div class="acts">'+nextActs(o).map(function(a){return '<button class="btn '+a[2]+'" data-set="'+esc(a[0])+'">'+a[1]+'</button>'}).join("")+
+    '<button class="btn wa" data-wa="1">💬 Написать в WhatsApp</button></div></article>';
+}
+function renderList(){
+  var L=S.orders.filter(function(o){return inTab(o,S.tab)});
+  if(S.q)L=L.filter(function(o){return (o.no+" "+o.name+" "+o.phone+" "+digits(o.phone)).toLowerCase().indexOf(S.q)>=0});
+  $("#list").innerHTML=L.length?L.map(card).join(""):'<div class="empty">'+(S.orders.length?"Здесь пусто":"Заказов пока нет")+'</div>';
+}
+
+function msgFor(o,st){
+  var hi="Здравствуйте"+(o.name?", "+o.name:"")+"!",no="#"+o.no,sum=o.total+" AMD";
+  if(st==="Одобрен"){
+    if(isPick(o))return hi+" Ваш заказ "+no+" одобрен ✅\nСумма: "+sum+".\nЖдём вас: "+S.address+(S.hours?", "+S.hours:"")+".";
+    return hi+" Ваш заказ "+no+" одобрен ✅\nСумма к оплате: "+sum+".\n\nПереведите, пожалуйста, на карту:\n"+(S.card?cardFmt()+(S.cardName||S.cardBank?"\n"+[S.cardName,S.cardBank].filter(Boolean).join(" · "):""):"____ ____ ____ ____ (номер карты не указан в Админке)")+"\n\nИ пришлите сюда скриншот перевода — после оплаты сразу отправим заказ курьером Yandex Go.";
+  }
+  if(st==="Оплата получена")return hi+" Оплата "+sum+" по заказу "+no+" получена ✅\nСпасибо! Передаём заказ курьеру Yandex Go — пришлём, когда он выедет.";
+  if(st==="Передан курьеру")return "Заказ "+no+" передан курьеру 🚕\nСкоро будет у вас. Спасибо, что выбрали T Store!";
+  if(st==="Выдан")return "Спасибо за покупку! 🙏 Заказ "+no+" выдан. Будем рады видеть вас снова — tstore.am";
+  if(st==="Отменён")return hi+" Заказ "+no+" отменён. Если это ошибка — напишите нам, пожалуйста.";
+  return hi+" Пишем по заказу "+no+".";
+}
+function waLink(o,text){var d=digits(o.phone);return "https://api.whatsapp.com/send?phone="+d+"&text="+encodeURIComponent(text)}
+
+function askWa(o,st,title){
+  var el=document.createElement("div");el.className="sheet";
+  el.innerHTML='<div><h3>'+esc(title)+'</h3><textarea id="wtx">'+esc(msgFor(o,st))+'</textarea><div class="acts"><button class="btn wa main" id="wgo">💬 Отправить клиенту в WhatsApp</button><button class="btn" id="wno">Не писать</button></div></div>';
+  document.body.appendChild(el);
+  function close(){el.remove()}
+  el.onclick=function(e){if(e.target===el)close()};
+  $("#wno").onclick=close;
+  $("#wgo").onclick=function(){var t=$("#wtx").value;window.open(waLink(o,t),"_blank","noopener");close()};
+}
+function onAct(e){
+  var b=e.target.closest("[data-set],[data-wa]");if(!b)return;
+  var no=b.closest(".o").dataset.no,o=S.orders.find(function(x){return x.no===no});if(!o)return;
+  if(b.dataset.wa){askWa(o,o.status,"Сообщение клиенту");return}
+  var st=b.dataset.set;
+  if(st==="Отменён"&&!confirmTap(b,"Точно отменить?"))return;
+  b.disabled=true;var old=b.textContent;b.textContent="Сохраняем…";
+  api({op:"set",no:no,st:st}).then(function(r){
+    if(!r||!r.ok){b.disabled=false;b.textContent=old;toast(r&&r.err==="pin"?"Неверный PIN":"Не удалось сохранить — проверьте интернет");return}
+    o.status=st;o.hist=(o.hist?o.hist+"\n":"")+"сейчас — "+st;renderTabs();renderList();toast("Статус: "+st);
+    askWa(o,st,"Сообщить клиенту: "+st);
+  }).catch(function(){b.disabled=false;b.textContent=old;toast("Нет связи с таблицей заказов")});
+}
+
+function refresh(first){
+  var rf=$("#rf");if(rf)rf.classList.add("spin");
+  return api({op:"list",limit:150}).then(function(r){
+    if(rf)rf.classList.remove("spin");
+    if(!r||!r.ok){if(r&&r.err==="pin"){ls("ops_pin",null);clearInterval(S.timer);lockView("Неверный PIN")}else if(first)lockView("Таблица заказов не отвечает. Обновите скрипт Google (см. инструкцию).");else toast("Не удалось обновить");return}
+    if(first){ls("ops_pin",S.pin);shell();clearInterval(S.timer);S.timer=setInterval(function(){if(!document.hidden&&!document.querySelector(".sheet"))refresh()},30000)}
+    var prev=S.orders.length?S.orders[0].no:null;S.orders=r.orders||[];
+    if(prev&&S.orders[0]&&S.orders[0].no!==prev)toast("🔔 Новый заказ #"+S.orders[0].no);
+    $("#upd").textContent="Обновлено "+new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"})+" · авто каждые 30 с";
+    renderTabs();renderList();
+  }).catch(function(){if(rf)rf.classList.remove("spin");if(first)lockView("Нет связи с таблицей заказов. Проверьте интернет или обновите скрипт Google.");else toast("Нет связи")});
+}
+
+$("#app").innerHTML='<div class="empty">Загрузка…</div>';
+loadShop().then(function(){
+  if(!/^https:\/\/script\.google\.com\//.test(S.hook)){$("#app").innerHTML='<div class="empty">В Админке сайта не указана ссылка Google Apps Script (журнал заказов).</div>';return}
+  S.pin=ls("ops_pin");if(S.pin)refresh(true);else lockView();
+}).catch(function(){$("#app").innerHTML='<div class="empty">Не удалось загрузить настройки магазина.</div>'});
+document.addEventListener("visibilitychange",function(){if(!document.hidden&&S.pin&&$("#list"))refresh()});
+})();
+</script>
+</body>
+</html>
