@@ -195,18 +195,19 @@ function onAct(e){
 }
 
 function refresh(first){
+  if(S.busy&&!first)return Promise.resolve();S.busy=true;
   var rf=$("#rf");if(rf)rf.classList.add("spin");
-  return api({op:"list",limit:150}).then(function(r){
+  return api({op:"list",limit:80}).then(function(r){S.busy=false;
     if(rf)rf.classList.remove("spin");
     if(!r||!r.ok){if(r&&r.err==="pin"){ls("ops_pin",null);clearInterval(S.timer);lockView("Неверный PIN")}else if(first)lockView("Таблица заказов не отвечает. Обновите скрипт Google (см. инструкцию).");else toast("Не удалось обновить");return}
     if(r.role==="cashier"){if(first){ls("cash_pin",S.pin);location.href="cash.html"}return}
-    if(first){ls("ops_pin",S.pin);shell();clearInterval(S.timer);S.timer=setInterval(function(){if(!document.hidden&&!document.querySelector(".sheet"))refresh()},30000)}
+    if(first){ls("ops_pin",S.pin);shell();clearInterval(S.timer);S.timer=setInterval(function(){if(!document.hidden&&!document.querySelector(".sheet"))refresh()},12000)}
     var prev=S.orders.length?S.orders[0].no:null,old={};S.orders.forEach(function(o){old[o.no]=o.status});S.orders=r.orders||[];
     if(prev)S.orders.forEach(function(o){if(old[o.no]&&old[o.no]!=="Оплата получена"&&o.status==="Оплата получена"&&/кассир/.test(lastLine(o))){toast("💰 Кассир подтвердил оплату #"+o.no+" — сообщите клиенту");try{navigator.vibrate&&navigator.vibrate([80,60,80])}catch(x){}}});
     if(prev&&S.orders[0]&&S.orders[0].no!==prev)toast("🔔 Новый заказ #"+S.orders[0].no);
-    $("#upd").textContent="Обновлено "+new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"})+" · авто каждые 30 с";
+    $("#upd").textContent="Обновлено "+new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"})+" · авто каждые 12 с";
     renderTabs();renderList();
-  }).catch(function(){if(rf)rf.classList.remove("spin");if(first)lockView("Нет связи с таблицей заказов. Проверьте интернет или обновите скрипт Google.");else toast("Нет связи")});
+  }).catch(function(){S.busy=false;if(rf)rf.classList.remove("spin");if(first)lockView("Нет связи с таблицей заказов. Проверьте интернет или обновите скрипт Google.");else toast("Нет связи")});
 }
 
 $("#app").innerHTML='<div class="empty">Загрузка…</div>';

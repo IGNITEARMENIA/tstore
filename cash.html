@@ -102,20 +102,22 @@ function onPay(e){
     toast("✓ Оплата по #"+b.dataset.no+" подтверждена");render();
   }).catch(function(){b.disabled=false;b.classList.remove("sure");b.textContent="✅ Деньги поступили";toast("Нет связи с таблицей заказов")});
 }
+function beep(){try{var A=window.AudioContext||window.webkitAudioContext;var c=S.ac||(S.ac=new A());[0,0.18].forEach(function(d){var o=c.createOscillator(),g=c.createGain();o.frequency.value=880;g.gain.setValueAtTime(0.0001,c.currentTime+d);g.gain.exponentialRampToValueAtTime(0.3,c.currentTime+d+0.02);g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+d+0.15);o.connect(g);g.connect(c.destination);o.start(c.currentTime+d);o.stop(c.currentTime+d+0.16)})}catch(e){}}
 function refresh(first){
   var rf=$("#rf");if(rf)rf.classList.add("spin");
-  return api({op:"list",limit:120}).then(function(r){
+  if(S.busy&&!first)return Promise.resolve();S.busy=true;
+  return api({op:"list",limit:40}).then(function(r){S.busy=false;
     if(rf)rf.classList.remove("spin");
     if(!r||!r.ok){if(r&&r.err==="pin"){ls("cash_pin",null);clearInterval(S.timer);lockView("Неверный PIN")}else if(first)lockView("Таблица заказов не отвечает.");else toast("Не удалось обновить");return}
     if(r.role!=="cashier"&&first){toast("Это PIN менеджера — откроется приложение менеджера");setTimeout(function(){location.href="ops.html"},900);return}
-    if(first){ls("cash_pin",S.pin);shell();clearInterval(S.timer);S.timer=setInterval(function(){if(!document.hidden)refresh()},20000)}
+    if(first){ls("cash_pin",S.pin);shell();clearInterval(S.timer);S.timer=setInterval(function(){if(!document.hidden)refresh()},7000)}
     var before=S.orders.filter(function(o){return o.status==="Одобрен"}).map(function(o){return o.no});
     S.orders=r.orders||[];
     var fresh=S.orders.filter(function(o){return o.status==="Одобрен"&&before.indexOf(o.no)<0});
-    if(!first&&fresh.length){toast("🔔 Ждём перевод: #"+fresh[0].no+" · "+fresh[0].total+" AMD");try{navigator.vibrate&&navigator.vibrate([80,60,80])}catch(x){}}
-    $("#upd").textContent="Обновлено "+new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"})+" · авто каждые 20 с";
+    if(!first&&fresh.length){beep();toast("🔔 Ждём перевод: #"+fresh[0].no+" · "+fresh[0].total+" AMD");try{navigator.vibrate&&navigator.vibrate([80,60,80])}catch(x){}}
+    $("#upd").textContent="Обновлено "+new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"})+" · авто каждые 7 с";
     render();
-  }).catch(function(){if(rf)rf.classList.remove("spin");if(first)lockView("Нет связи с таблицей заказов.");else toast("Нет связи")});
+  }).catch(function(){S.busy=false;if(rf)rf.classList.remove("spin");if(first)lockView("Нет связи с таблицей заказов.");else toast("Нет связи")});
 }
 $("#app").innerHTML='<div class="empty" style="margin:40px 16px">Загрузка…</div>';
 loadShop().then(function(){
